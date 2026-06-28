@@ -6,7 +6,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { db } from '../config/firebase';
-import { ref, get, set, remove, onValue } from 'firebase/database';
+import { ref, get, set, remove, onValue, push } from 'firebase/database';
 import { useAuth } from '../store/AuthContext';
 import { useGameStore } from '../store/useGameStore';
 import { ALL_CREATURES, CREATURE_LIST } from '../data/creatures';
@@ -59,6 +59,11 @@ export default function AdminScreen() {
   const [guilds, setGuilds] = useState([]);
   const [showGuildReset, setShowGuildReset] = useState(false);
   const [guildSearch, setGuildSearch] = useState('');
+  const [newsList, setNewsList] = useState([]);
+  const [newsTitle, setNewsTitle] = useState('');
+  const [newsContent, setNewsContent] = useState('');
+  const [newsType, setNewsType] = useState('news');
+  const [newsEmoji, setNewsEmoji] = useState('📢');
   const [searchQuery, setSearchQuery]   = useState('');
 
   const feedbackAnim = useRef(new Animated.Value(0)).current;
@@ -66,6 +71,18 @@ export default function AdminScreen() {
 
   useEffect(()=>{
     Animated.timing(titleAnim,{toValue:1,duration:500,useNativeDriver:true}).start();
+  },[]);
+
+  useEffect(()=>{
+    const unsubNews = onValue(ref(db,'news'),snap=>{
+      if (snap.exists()) {
+        const items = Object.entries(snap.val())
+          .map(([id,v])=>({id,...v}))
+          .sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+        setNewsList(items);
+      } else setNewsList([]);
+    });
+    return unsubNews;
   },[]);
 
   useEffect(()=>{
@@ -215,6 +232,30 @@ export default function AdminScreen() {
     } catch(e) { showFeedback('Erreur', 'warning'); }
   }
 
+  // Publier une news
+  async function handlePublishNews() {
+    if (!newsTitle.trim()||!newsContent.trim()) { showFeedback('Titre et contenu requis !','warning'); return; }
+    const lines = newsContent.split('\n').filter(l=>l.trim());
+    await push(ref(db,'news'), {
+      type: newsType,
+      tag: newsType==='patch'?'PATCH NOTES':newsType==='event'?'ÉVÉNEMENT':'ANNONCE',
+      tagColor: newsType==='patch'?'#00e5ff':newsType==='event'?'#bf5fff':'#39ff8f',
+      title: newsTitle.trim(),
+      emoji: newsEmoji,
+      bg: newsType==='patch'?['#0d1a2e','#07090f']:newsType==='event'?['#0a0018','#150030']:['#041204','#07090f'],
+      content: lines,
+      date: new Date().toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'}),
+      createdAt: Date.now(),
+    });
+    setNewsTitle(''); setNewsContent('');
+    showFeedback('✓ Actualité publiée !');
+  }
+
+  async function handleDeleteNews(id) {
+    await remove(ref(db,`news/${id}`));
+    showFeedback('✓ Actualité supprimée','warning');
+  }
+
   // Mon compte
   async function handleGiveSelfCrystals() {
     addCrystals(parseInt(crystalAmount)||50);
@@ -276,7 +317,7 @@ export default function AdminScreen() {
 
         {/* Tabs */}
         <View style={styles.tabRow}>
-          {['Stats','Joueurs','Mon compte'].map(t=>(
+          {['Stats','Joueurs','News','Mon compte'].map(t=>(
             <TouchableOpacity key={t} onPress={()=>setTab(t)}
               style={[styles.tabBtn,tab===t&&styles.tabActive]}>
               <Text style={[styles.tabText,tab===t&&styles.tabTextActive]}>{t}</Text>
@@ -505,6 +546,59 @@ export default function AdminScreen() {
             )
           )}
 
+          {/* ── NEWS ── */}
+          {tab==='News'&&(
+            <>
+              <Text style={styles.sectionLabel}>📰 PUBLIER UNE ACTUALITÉ</Text>
+              <ActionCard title="Nouvelle actualité" emoji="📢">
+                {/* Type */}
+                <View style={{flexDirection:'row',gap:8}}>
+                  {[{id:'news',label:'Annonce',color:'#39ff8f'},{id:'patch',label:'Patch',color:'#00e5ff'},{id:'event',label:'Événement',color:'#bf5fff'}].map(t=>(
+                    <TouchableOpacity key={t.id} onPress={()=>setNewsType(t.id)}
+                      style={[styles.btn,{flex:1,borderColor:newsType===t.id?t.color+'55':'#1e2d4a',backgroundColor:newsType===t.id?t.color+'15':'#0d1220'}]}>
+                      <Text style={[styles.btnText,{color:newsType===t.id?t.color:'#4a6080'}]}>{t.label}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+                {/* Emoji */}
+                <View style={{flexDirection:'row',gap:8,alignItems:'center'}}>
+                  <Text style={{color:'#4a6080',fontSize:12}}>Emoji :</Text>
+                  <TextInput style={[styles.input,{flex:1,fontSize:20,textAlign:'center'}]}
+                    value={newsEmoji} onChangeText={setNewsEmoji} maxLength={2}/>
+                </View>
+                {/* Titre */}
+                <TextInput style={styles.input} value={newsTitle} onChangeText={setNewsTitle}
+                  placeholder="Titre de l'actualité..." placeholderTextColor="#4a6080" maxLength={60}/>
+                {/* Contenu */}
+                <TextInput style={[styles.input,{height:120,textAlignVertical:'top'}]}
+                  value={newsContent} onChangeText={setNewsContent}
+                  placeholder={"Une ligne = un bullet point\nEx: ✦ Nouvelle feature\n🔥 Correction de bug"}
+                  placeholderTextColor="#4a6080" multiline maxLength={500}/>
+                <TouchableOpacity onPress={handlePublishNews}
+                  style={[styles.mainBtn,{borderColor:'#39ff8f44',backgroundColor:'#39ff8f15'}]}>
+                  <Text style={[styles.mainBtnText,{color:'#39ff8f'}]}>📢 Publier</Text>
+                </TouchableOpacity>
+              </ActionCard>
+
+              {/* Liste news existantes */}
+              <Text style={styles.sectionLabel}>ACTUALITÉS PUBLIÉES ({newsList.length})</Text>
+              {newsList.length===0&&<Text style={styles.emptyText}>Aucune actualité Firebase</Text>}
+              {newsList.map(n=>(
+                <View key={n.id} style={[styles.newsRow,{borderColor:(n.tagColor||'#1e2d4a')+'44'}]}>
+                  <Text style={{fontSize:22,width:36,textAlign:'center'}}>{n.emoji||'📢'}</Text>
+                  <View style={{flex:1,gap:2}}>
+                    <Text style={[styles.newsRowTitle,{color:n.tagColor||'#c8daf0'}]}>{n.title}</Text>
+                    <Text style={styles.newsRowDate}>{n.date}</Text>
+                  </View>
+                  <TouchableOpacity onPress={()=>handleDeleteNews(n.id)}
+                    style={styles.newsDeleteBtn}>
+                    <Text style={styles.newsDeleteText}>✕</Text>
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </>
+          )}
+
           {/* ── MON COMPTE ── */}
           {tab==='Mon compte'&&(
             <>
@@ -726,4 +820,9 @@ const styles = StyleSheet.create({
   guildResetMeta:{color:'#4a6080',fontSize:10},
   guildResetBtn:{backgroundColor:'#ff444422',borderWidth:1,borderColor:'#ff444444',borderRadius:10,paddingHorizontal:12,paddingVertical:6},
   guildResetBtnText:{color:'#ff6666',fontSize:12,fontWeight:'800'},
+  newsRow:{flexDirection:'row',alignItems:'center',gap:10,backgroundColor:'#0d1220',borderWidth:1,borderRadius:14,padding:12},
+  newsRowTitle:{fontSize:13,fontWeight:'700'},
+  newsRowDate:{color:'#4a6080',fontSize:10},
+  newsDeleteBtn:{backgroundColor:'#ff444422',borderWidth:1,borderColor:'#ff444433',borderRadius:8,paddingHorizontal:10,paddingVertical:6},
+  newsDeleteText:{color:'#ff4444',fontSize:13,fontWeight:'900'},
 });
