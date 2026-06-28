@@ -244,7 +244,7 @@ export default function FriendsScreen() {
           </TouchableOpacity>
           <ScrollView contentContainerStyle={styles.profileScroll} showsVerticalScrollIndicator={false}>
             {/* Header */}
-            <LinearGradient colors={['#0d1a2e','#0a2040']} style={styles.profileHeader}>
+            <LinearGradient colors={['#0d1a2e','#0a2040']} style={[styles.profileHeader,{borderWidth:1,borderColor:'#00e5ff22'}]}>
               <Avatar name={friendProfile.name} size={80} color="#00e5ff"/>
               <Text style={styles.profileName}>{friendProfile.name}</Text>
               <View style={[styles.rankBadge,{backgroundColor:rank.color+'22',borderColor:rank.color+'44'}]}>
@@ -420,7 +420,7 @@ export default function FriendsScreen() {
         <Animated.Text style={[styles.title,{
           opacity:titleAnim,
           transform:[{translateY:titleAnim.interpolate({inputRange:[0,1],outputRange:[-16,0]})}],
-        }]}>AMIS</Animated.Text>
+        }]}>👥 AMIS</Animated.Text>
 
         {/* Feedback animé */}
         {feedback!==''&&(
@@ -430,7 +430,7 @@ export default function FriendsScreen() {
         )}
 
         {/* Mon ID */}
-        <View style={styles.myIdBox}>
+        <LinearGradient colors={['#0d1a2e','#07090f']} style={[styles.myIdBox,{borderColor:'#00e5ff22'}]}>
           <Avatar name={myName} size={36} color="#00e5ff"/>
           <View style={{flex:1,gap:1}}>
             <Text style={styles.myIdLabel}>TON NOM</Text>
@@ -440,7 +440,7 @@ export default function FriendsScreen() {
             <Text style={styles.friendCountVal}>{friends.length}</Text>
             <Text style={styles.friendCountLbl}>amis</Text>
           </View>
-        </View>
+        </LinearGradient>
 
         {/* Tabs */}
         <View style={styles.tabRow}>
@@ -464,14 +464,15 @@ export default function FriendsScreen() {
                 <Text style={styles.emptyHint}>Recherche des joueurs pour les ajouter !</Text>
               </View>
               :friends.map((f,i)=>(
-                <TouchableOpacity key={f.uid} onPress={()=>openFriendProfile(f.uid)}
-                  style={styles.friendRow}>
-                  <Avatar name={f.name} size={46} color="#00e5ff"/>
-                  <View style={styles.friendInfo}>
-                    <Text style={styles.friendName}>{f.name}</Text>
-                    <Text style={styles.friendSub}>Voir la collection →</Text>
-                  </View>
-                  <Text style={styles.friendArrow}>›</Text>
+                <TouchableOpacity key={f.uid} onPress={()=>openFriendProfile(f.uid)}>
+                  <LinearGradient colors={['#0d1a2e','#07090f']} style={[styles.friendRow,{borderColor:'#00e5ff22'}]}>
+                    <Avatar name={f.name} size={46} color="#00e5ff"/>
+                    <View style={styles.friendInfo}>
+                      <Text style={styles.friendName}>{f.name}</Text>
+                      <Text style={styles.friendSub}>Voir la collection →</Text>
+                    </View>
+                    <Text style={[styles.friendArrow,{color:'#00e5ff'}]}>›</Text>
+                  </LinearGradient>
                 </TouchableOpacity>
               ))
             }
@@ -633,7 +634,7 @@ export default function FriendsScreen() {
             {requests.length===0
               ?<View style={styles.emptyBox}><Text style={styles.emptyEmoji}>📬</Text><Text style={styles.emptyTitle}>Aucune demande en attente</Text></View>
               :requests.map(req=>(
-                <View key={req.uid} style={[styles.requestRow]}>
+                <LinearGradient key={req.uid} colors={['#18000f','#07090f']} style={[styles.requestRow,{borderColor:'#ff4fa333'}]}>
                   <Avatar name={req.fromName} size={46} color="#ff4fa3"/>
                   <View style={styles.friendInfo}>
                     <Text style={styles.friendName}>{req.fromName}</Text>
@@ -647,7 +648,7 @@ export default function FriendsScreen() {
                       <Text style={styles.declineBtnText}>✕</Text>
                     </TouchableOpacity>
                   </View>
-                </View>
+                </LinearGradient>
               ))
             }
           </ScrollView>
@@ -696,7 +697,7 @@ const styles = StyleSheet.create({
   rankBadge:{borderWidth:1,borderRadius:10,paddingHorizontal:10,paddingVertical:4},
   rankBadgeText:{fontSize:11,fontWeight:'800',letterSpacing:1},
   statsGrid:{flexDirection:'row',flexWrap:'wrap',gap:8},
-  statBox:{flex:1,minWidth:'45%',backgroundColor:'#0d1220',borderWidth:1,borderRadius:14,padding:12,alignItems:'center',gap:4},
+  statBox:{flex:1,minWidth:'45%',borderWidth:1,borderRadius:14,padding:12,alignItems:'center',gap:4},
   statEmoji:{fontSize:20},
   statValue:{fontSize:22,fontWeight:'900'},
   statLabel:{fontSize:8,color:'#4a6080',letterSpacing:1,textTransform:'uppercase'},
@@ -760,7 +761,7 @@ const styles = StyleSheet.create({
   cancelTradeBtn:{alignItems:'center',padding:10},
   cancelTradeBtnText:{color:'#4a6080',fontSize:13},
   // Trade cards
-  tradeCard:{backgroundColor:'#0d1220',borderWidth:1,borderRadius:18,padding:14,gap:12},
+  tradeCard:{backgroundColor:'#0d1220',borderWidth:1.5,borderRadius:18,padding:14,gap:12},
   tradeCardHeader:{flexDirection:'row',alignItems:'center',gap:8},
   tradeCardFrom:{color:'#4a6080',fontSize:11,fontWeight:'700',flex:1},
   tradeCardRow:{flexDirection:'row',alignItems:'center',justifyContent:'space-around'},

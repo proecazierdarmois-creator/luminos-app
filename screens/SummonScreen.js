@@ -166,7 +166,7 @@ export default function SummonScreen() {
         <Text style={styles.subtitle}>Tire une créature du cosmos</Text>
 
         {/* Solde */}
-        <LinearGradient colors={['#0d1a2e','#07090f']} style={styles.crystalBar}>
+        <LinearGradient colors={['#0d1a2e','#07090f']} style={[styles.crystalBar,{borderColor:'#ffd70022'}]}>
           <View>
             <Text style={styles.crystalLbl}>SOLDE</Text>
             <Text style={styles.crystalVal}>💎 {crystals}</Text>
@@ -185,6 +185,9 @@ export default function SummonScreen() {
 
           {/* ── PORTAIL ── */}
           <View style={styles.portalWrap} pointerEvents="none">
+            {/* Fond portail */}
+            <LinearGradient colors={[portalColor+'22','transparent']}
+              style={{position:'absolute',width:180,height:180,borderRadius:90}}/>
             {/* Anneaux */}
             <Animated.View style={[styles.ring1,{
               transform:[{rotate:rot}],
@@ -208,11 +211,14 @@ export default function SummonScreen() {
             }]}/>
             {/* Symbole central */}
             {phase!=='result'&&phase!=='spinning'&&(
-              <Animated.Text style={[styles.orbSymbol,{
-                color:portalColor,
-                opacity:glowAnim.interpolate({inputRange:[0,1],outputRange:[0.4,1]}),
-                transform:[{rotate:rot},{scale:pulseAnim}],
-              }]}>✦</Animated.Text>
+              <Animated.View style={{
+                alignItems:'center',justifyContent:'center',
+                opacity:glowAnim.interpolate({inputRange:[0,1],outputRange:[0.5,1]}),
+                transform:[{scale:pulseAnim}],
+              }}>
+                <Text style={[styles.orbSymbol,{color:portalColor}]}>✦</Text>
+                <Text style={[styles.orbSubText,{color:portalColor+'88'}]}>PORTAIL</Text>
+              </Animated.View>
             )}
             {/* Spinner */}
             {phase==='spinning'&&(
@@ -305,17 +311,27 @@ export default function SummonScreen() {
             <>
               <TouchableOpacity onPress={()=>handleSummon(false)} disabled={!canSummon}
                 style={[styles.summonBtn,!canSummon&&styles.disabled]}>
-                <LinearGradient colors={['#00e5ff55','#bf5fff44']} start={{x:0,y:0}} end={{x:1,y:0}} style={styles.btnGrad}>
-                  <Text style={styles.btnText}>✦ INVOQUER</Text>
-                  <Text style={styles.btnCost}>{SUMMON_COST} 💎</Text>
+                <LinearGradient colors={['#00e5ff66','#bf5fff55']} start={{x:0,y:0}} end={{x:1,y:0}} style={styles.btnGrad}>
+                  <View style={styles.btnInner}>
+                    <Text style={styles.btnText}>✦ INVOQUER</Text>
+                    <View style={styles.btnCostBadge}>
+                      <Text style={styles.btnCostText}>{SUMMON_COST} 💎</Text>
+                    </View>
+                  </View>
+                  <Text style={styles.btnSub}>Tire une créature du cosmos</Text>
                 </LinearGradient>
               </TouchableOpacity>
 
               <TouchableOpacity onPress={()=>handleSummon(true)} disabled={crystals<SUMMON_COST*10}
-                style={[styles.summonBtn,{borderColor:'#ffd70033'},crystals<SUMMON_COST*10&&styles.disabled]}>
-                <LinearGradient colors={['#ffd70044','#ffa50033']} start={{x:0,y:0}} end={{x:1,y:0}} style={styles.btnGrad}>
-                  <Text style={[styles.btnText,{color:'#ffd700'}]}>✦✦ INVOQUER ×10</Text>
-                  <Text style={[styles.btnCost,{color:'#ffd70099'}]}>{SUMMON_COST*10} 💎 · Rare garantie</Text>
+                style={[styles.summonBtn,{borderColor:'#ffd70044'},crystals<SUMMON_COST*10&&styles.disabled]}>
+                <LinearGradient colors={['#ffd70055','#ffa50044']} start={{x:0,y:0}} end={{x:1,y:0}} style={styles.btnGrad}>
+                  <View style={styles.btnInner}>
+                    <Text style={[styles.btnText,{color:'#ffd700'}]}>✦✦ INVOQUER ×10</Text>
+                    <View style={[styles.btnCostBadge,{backgroundColor:'#ffd70022',borderColor:'#ffd70044'}]}>
+                      <Text style={[styles.btnCostText,{color:'#ffd700'}]}>{SUMMON_COST*10} 💎</Text>
+                    </View>
+                  </View>
+                  <Text style={[styles.btnSub,{color:'#ffd70088'}]}>Rare garantie · Meilleure valeur</Text>
                 </LinearGradient>
               </TouchableOpacity>
             </>
@@ -323,7 +339,17 @@ export default function SummonScreen() {
 
           {phase==='spinning'&&(
             <View style={styles.spinningBox}>
-              <Text style={styles.spinningText}>Le cosmos répond...</Text>
+              <Animated.Text style={[styles.spinningText,{
+                opacity:spinAnim.interpolate({inputRange:[0,1],outputRange:[1,0.4]}),
+              }]}>✦ Le cosmos répond... ✦</Animated.Text>
+              <View style={styles.dotsRow}>
+                {[0,1,2].map(i=>(
+                  <Animated.View key={i} style={[styles.spinDot,{
+                    backgroundColor:'#00e5ff',
+                    opacity:glowAnim.interpolate({inputRange:[0,1],outputRange:[0.3,1]}),
+                  }]}/>
+                ))}
+              </View>
             </View>
           )}
 
@@ -450,6 +476,13 @@ const styles = StyleSheet.create({
   rateBarFill:{height:'100%',borderRadius:4},
   rateVal:{fontSize:12,fontWeight:'900',width:32,textAlign:'right'},
   shinyNote:{fontSize:10,color:'#ff69b4',fontStyle:'italic'},
+  orbSubText:{fontSize:8,fontWeight:'700',letterSpacing:2,marginTop:2},
+  btnInner:{flexDirection:'row',alignItems:'center',gap:10},
+  btnCostBadge:{backgroundColor:'#ffffff18',borderWidth:1,borderColor:'#ffffff33',borderRadius:8,paddingHorizontal:8,paddingVertical:3},
+  btnCostText:{color:'#fff',fontSize:11,fontWeight:'900'},
+  btnSub:{color:'rgba(255,255,255,0.5)',fontSize:10,letterSpacing:1},
+  dotsRow:{flexDirection:'row',gap:8,marginTop:8},
+  spinDot:{width:10,height:10,borderRadius:5},
   // Historique
   histBox:{width:'100%',backgroundColor:'#0d1220',borderWidth:1,borderColor:'#1e2d4a',borderRadius:16,padding:14,gap:10},
   histGrid:{flexDirection:'row',flexWrap:'wrap',gap:8},
