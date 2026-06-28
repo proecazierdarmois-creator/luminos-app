@@ -8,6 +8,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { db } from '../config/firebase';
 import { ref, onValue, set, remove, push, get } from 'firebase/database';
 import { useAuth } from '../store/AuthContext';
+import { useNavigation } from '@react-navigation/native';
 import { useGameStore } from '../store/useGameStore';
 import { addXp } from '../store/xpService';
 import { auth } from '../config/firebase';
@@ -111,6 +112,7 @@ function MessageCard({ msg, onClaim, onDelete, index }) {
 
 // ─── InboxScreen ─────────────────────────────────────────────────
 export default function InboxScreen() {
+  const navigation = useNavigation();
   const authCtx = useAuth();
   const user    = authCtx?.user;
   const uid     = user?.uid||'guest';
@@ -196,6 +198,11 @@ export default function InboxScreen() {
     <LinearGradient colors={['#07090f','#0d1220','#07090f']} style={styles.container}>
       <SafeAreaView style={styles.safe}>
 
+        {/* Bouton retour */}
+        <TouchableOpacity onPress={()=>navigation.goBack()} style={styles.backBtn}>
+          <Text style={styles.backBtnText}>← Retour</Text>
+        </TouchableOpacity>
+
         <Animated.Text style={[styles.title,{
           opacity:titleAnim,
           transform:[{translateY:titleAnim.interpolate({inputRange:[0,1],outputRange:[-16,0]})}],
@@ -269,6 +276,8 @@ export async function sendInboxMessage(uid, {type='system',title,description='',
 const styles = StyleSheet.create({
   container:{flex:1}, safe:{flex:1,paddingHorizontal:16},
   title:{fontSize:20,fontWeight:'900',color:'#fff',letterSpacing:4,textAlign:'center',paddingTop:16,marginBottom:10},
+  backBtn:{paddingTop:12,paddingBottom:4,paddingHorizontal:4},
+  backBtnText:{color:'#00e5ff',fontSize:14,fontWeight:'700'},
   feedbackBox:{backgroundColor:'#39ff8f22',borderWidth:1,borderColor:'#39ff8f44',borderRadius:12,padding:10,alignItems:'center',marginBottom:8},
   feedbackText:{color:'#39ff8f',fontSize:13,fontWeight:'700'},
   // Stats
