@@ -26,6 +26,7 @@ const QUICK_ACTIONS = [
   { label:'Quêtes',    icon:'📋', screen:'Quests',     color:'#00e5ff', bg:['#0d1a2e','#0a2040'] },
   { label:'Tournoi',   icon:'🏆', screen:'Tournament', color:'#ff6b35', bg:['#180800','#281200'] },
   { label:'Éclipse',   icon:'🌑', screen:'Eclipse',    color:'#bf5fff', bg:['#0a0018','#150030'] },
+  { label:'News',      icon:'📰', screen:'News',        color:'#ffa500', bg:['#1a0e00','#0d0700'] },
 ];
 
 function Star({ x, y, size, delay }) {

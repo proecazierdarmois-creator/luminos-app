@@ -28,6 +28,7 @@ import GuildChallengeScreen  from './screens/GuildChallengeScreen';
 import StoryScreen      from './screens/StoryScreen';
 import AdminScreen       from './screens/AdminScreen';
 import HomeScreen        from './screens/HomeScreen';
+import NewsScreen        from './screens/NewsScreen';
 
 const Tab = createBottomTabNavigator();
 const ADMIN_UID = 'NpKZ4aF5kVMlZTN3W8Wy3GCNOhK2';
@@ -64,6 +65,8 @@ function MainTabs() {
     >
       <Tab.Screen name="Home"          component={HomeScreen}
         options={{ tabBarIcon: ({ focused }) => <TabIcon icon="🏠" label="ACCUEIL"   focused={focused} color="#00e5ff" /> }} />
+      <Tab.Screen name="News"          component={NewsScreen}
+        options={{ tabBarIcon: ({ focused }) => <TabIcon icon="📰" label="NEWS"      focused={focused} color="#ffa500" /> }} />
       <Tab.Screen name="Profile"      component={ProfileScreen}
         options={{ tabBarIcon: ({ focused }) => <TabIcon icon="👤" label="PROFIL"    focused={focused} color="#00e5ff" /> }} />
       <Tab.Screen name="Story"        component={StoryScreen}
