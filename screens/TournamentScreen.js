@@ -403,7 +403,7 @@ export default function TournamentScreen() {
           <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.lobbyScroll}>
 
             <Animated.View style={{opacity:titleAnim,transform:[{translateY:titleAnim.interpolate({inputRange:[0,1],outputRange:[-20,0]})}]}}>
-              <Text style={styles.title}>TOURNOI</Text>
+              <Text style={styles.title}>🏆 TOURNOI</Text>
               <Text style={styles.subtitle}>8 joueurs · Élimination directe</Text>
             </Animated.View>
 
@@ -411,7 +411,7 @@ export default function TournamentScreen() {
             <Animated.Text style={[styles.trophy,{transform:[{scale:pulseAnim}]}]}>🏆</Animated.Text>
 
             {/* Récompenses */}
-            <View style={styles.rewardsCard}>
+            <LinearGradient colors={['#1a1000','#07090f']} style={styles.rewardsCard}>
               <Text style={styles.sectionLabel}>💎 RÉCOMPENSES</Text>
               {[
                 {rank:'🥇 Champion',  crystals:150, xp:150, color:'#ffd700', bg:['#1a1000','#2a1800']},
@@ -428,7 +428,7 @@ export default function TournamentScreen() {
                   </View>
                 </LinearGradient>
               ))}
-            </View>
+            </LinearGradient>
 
             {/* Créature */}
             <TouchableOpacity onPress={()=>setPickingCreature(true)}
@@ -449,7 +449,7 @@ export default function TournamentScreen() {
             </TouchableOpacity>
 
             {/* Guide */}
-            <View style={styles.howCard}>
+            <LinearGradient colors={['#0d1a2e','#07090f']} style={[styles.howCard,{borderColor:'#00e5ff18'}]}>
               <Text style={styles.sectionLabel}>⚔️ RÈGLES</Text>
               {[
                 ['🎮','8 joueurs (bots si nécessaire)'],
@@ -463,7 +463,7 @@ export default function TournamentScreen() {
                   <Text style={styles.howText}>{text}</Text>
                 </View>
               ))}
-            </View>
+            </LinearGradient>
 
             {/* Bouton rejoindre */}
             <TouchableOpacity onPress={joinTournament} disabled={loading} style={styles.joinBtn}>
@@ -569,6 +569,10 @@ export default function TournamentScreen() {
               <LinearGradient
                 colors={myRank===1?['#1a1000','#2a1800']:myRank===2?['#141414','#1e1e1e']:['#0d1220','#07090f']}
                 style={styles.resultGrad}>
+                <View style={[StyleSheet.absoluteFill,{borderRadius:24,overflow:'hidden'}]}>
+                  <LinearGradient colors={['rgba(255,255,255,0.04)','rgba(255,255,255,0)']}
+                    start={{x:0,y:0}} end={{x:1,y:1}} style={{flex:1}}/>
+                </View>
                 <Text style={styles.resultEmoji}>{myRank===1?'🥇':myRank===2?'🥈':'○'}</Text>
                 <Text style={[styles.resultTitle,{color:myRank===1?'#ffd700':myRank===2?'#c0c0c0':'#4a6080'}]}>
                   {myRank===1?'CHAMPION !':myRank===2?'FINALISTE':'ÉLIMINÉ'}
@@ -624,7 +628,7 @@ const styles = StyleSheet.create({
   howRow:{flexDirection:'row',alignItems:'center',gap:10},
   howIcon:{fontSize:16,width:24,textAlign:'center'},
   howText:{flex:1,color:'#6a84a0',fontSize:13,lineHeight:20},
-  joinBtn:{width:'100%',borderRadius:18,overflow:'hidden',borderWidth:1,borderColor:'#ffd70033'},
+  joinBtn:{width:'100%',borderRadius:18,overflow:'hidden',borderWidth:1.5,borderColor:'#ffd70055'},
   joinBtnGrad:{alignItems:'center',paddingVertical:22,gap:6},
   joinText:{color:'#ffd700',fontSize:17,fontWeight:'900',letterSpacing:2},
   joinSub:{color:'#ffd70077',fontSize:10,letterSpacing:1},
@@ -657,13 +661,13 @@ const styles = StyleSheet.create({
   donePillText:{color:'#39ff8f',fontSize:11,fontWeight:'800'},
   bracketScroll:{paddingHorizontal:16,paddingVertical:8,gap:20,paddingBottom:32},
   roundSection:{gap:10},
-  roundHeader:{flexDirection:'row',alignItems:'center',justifyContent:'space-between',paddingVertical:6,borderBottomWidth:1,borderColor:'#1e2d4a'},
-  roundTitle:{fontSize:12,color:'#4a6080',fontWeight:'900',letterSpacing:2},
+  roundHeader:{flexDirection:'row',alignItems:'center',justifyContent:'space-between',paddingVertical:8,borderBottomWidth:1,borderColor:'#1e2d4a',marginBottom:4},
+  roundTitle:{fontSize:11,color:'#4a6080',fontWeight:'900',letterSpacing:2},
   roundDone:{color:'#39ff8f',fontSize:14,fontWeight:'900'},
   roundPending:{flexDirection:'row',alignItems:'center',justifyContent:'center',gap:8,padding:16,backgroundColor:'#0d1220',borderRadius:12},
   roundPendingText:{color:'#4a6080',fontSize:12,fontStyle:'italic'},
   // Match
-  matchCard:{backgroundColor:'#0d1220',borderWidth:1,borderColor:'#1e2d4a',borderRadius:16,overflow:'hidden'},
+  matchCard:{backgroundColor:'#0d1220',borderWidth:1.5,borderColor:'#1e2d4a',borderRadius:16,overflow:'hidden'},
   matchCardMe:{borderColor:'#00e5ff33'},
   liveBanner:{paddingVertical:5,alignItems:'center'},
   liveBannerText:{color:'#ffd700',fontSize:9,fontWeight:'900',letterSpacing:2},
@@ -676,7 +680,7 @@ const styles = StyleSheet.create({
   emptySlot:{padding:14,alignItems:'center'},
   emptySlotText:{color:'#4a6080',fontSize:11,fontStyle:'italic'},
   playerSlotMe:{backgroundColor:'#00e5ff08'},
-  playerSlotWinner:{backgroundColor:'#39ff8f10'},
+  playerSlotWinner:{backgroundColor:'#39ff8f15',borderLeftWidth:3,borderLeftColor:'#39ff8f55'},
   playerSlotLoser:{opacity:0.45},
   slotInfo:{flex:1,gap:2},
   slotNameRow:{flexDirection:'row',alignItems:'center',gap:6},
