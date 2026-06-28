@@ -227,14 +227,14 @@ export default function InboxScreen() {
         </View>
 
         {/* Filtres */}
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterScroll}>
+        <View style={styles.filterRow}>
           {filters.map(f=>(
             <TouchableOpacity key={f.id} onPress={()=>setFilter(f.id)}
               style={[styles.filterBtn,filter===f.id&&{backgroundColor:f.color+'18',borderColor:f.color+'44'}]}>
               <Text style={[styles.filterText,filter===f.id&&{color:f.color}]}>{f.label}</Text>
             </TouchableOpacity>
           ))}
-        </ScrollView>
+        </View>
 
         {/* Messages */}
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
@@ -279,7 +279,7 @@ const styles = StyleSheet.create({
   claimAllBtn:{flex:1,borderWidth:1,borderRadius:14,padding:10,alignItems:'center',justifyContent:'center'},
   claimAllText:{color:'#ffd700',fontSize:11,fontWeight:'900'},
   // Filtres
-  filterScroll:{gap:8,paddingBottom:10,paddingRight:16},
+  filterRow:{flexDirection:'row',gap:6,marginBottom:10,flexWrap:'wrap'},
   filterBtn:{borderWidth:1,borderColor:'#1e2d4a',borderRadius:12,paddingHorizontal:12,paddingVertical:7,backgroundColor:'#0d1220'},
   filterText:{color:'#4a6080',fontSize:11,fontWeight:'700'},
   // Messages
