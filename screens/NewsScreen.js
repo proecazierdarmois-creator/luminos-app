@@ -184,15 +184,14 @@ export default function NewsScreen() {
         }]}>📰 ACTUALITÉS</Animated.Text>
 
         {/* Tabs */}
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.tabScroll}>
+        <View style={styles.tabRow}>
           {tabs.map(t=>(
             <TouchableOpacity key={t.id} onPress={()=>setTab(t.id)}
               style={[styles.tabBtn,tab===t.id&&{backgroundColor:t.color+'18',borderColor:t.color+'44'}]}>
               <Text style={[styles.tabText,tab===t.id&&{color:t.color}]}>{t.label}</Text>
             </TouchableOpacity>
           ))}
-        </ScrollView>
+        </View>
 
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
 
@@ -237,8 +236,8 @@ const styles = StyleSheet.create({
   container:{flex:1}, safe:{flex:1,paddingHorizontal:16},
   title:{fontSize:22,fontWeight:'900',color:'#fff',letterSpacing:5,textAlign:'center',paddingTop:16,marginBottom:10},
   // Tabs
-  tabScroll:{gap:8,paddingBottom:10,paddingRight:16,alignItems:'center',height:44},
-  tabBtn:{borderWidth:1,borderColor:'#1e2d4a',borderRadius:12,paddingHorizontal:14,paddingVertical:8,backgroundColor:'#0d1220',alignSelf:'flex-start'},
+  tabRow:{flexDirection:'row',gap:8,marginBottom:10,flexWrap:'wrap'},
+  tabBtn:{borderWidth:1,borderColor:'#1e2d4a',borderRadius:12,paddingHorizontal:14,paddingVertical:8,backgroundColor:'#0d1220'},
   tabText:{color:'#4a6080',fontSize:11,fontWeight:'700'},
   // Stats
   statsRow:{flexDirection:'row',gap:8,marginBottom:4},
