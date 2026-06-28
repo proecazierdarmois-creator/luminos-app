@@ -8,12 +8,15 @@ import {
   updateProfile,
   GoogleAuthProvider,
   GithubAuthProvider,
+  OAuthProvider,
+  FacebookAuthProvider,
   signInWithPopup,
   signInWithRedirect,
   getRedirectResult,
 } from 'firebase/auth';
 import { Platform } from 'react-native';
-import { auth } from '../config/firebase';
+import { auth, db } from '../config/firebase';
+import { ref, set } from 'firebase/database';
 import { setPlayerName, getPlayerId, claimPendingCrystals } from './marketService';
 import { setStoreUid, loadFromFirebase } from './useGameStore';
 import { initProfile } from './profileService';
@@ -53,6 +56,8 @@ export function AuthProvider({ children }) {
         await AsyncStorage.setItem('@luminos_last_uid', firebaseUser.uid).catch(() => {});
 
         setUser(firebaseUser);
+        // Met à jour lastSeen
+        set(ref(db,`players/${firebaseUser.uid}/lastSeen`), Date.now()).catch(()=>{});
         const name = firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'Joueur';
         setPlayerName(name);
         await initProfile(name);
@@ -152,12 +157,55 @@ export function AuthProvider({ children }) {
     }
   }
 
+  async function signInFacebook() {
+    setError(null);
+    const provider = new FacebookAuthProvider();
+    try {
+      const result = await signInWithPopup(auth, provider);
+      if (result?.user) {
+        const name = result.user.displayName || result.user.email?.split('@')[0] || 'Joueur';
+        setPlayerName(name);
+        await initProfile(name);
+        setUser(result.user);
+      }
+      return { success: true };
+    } catch (e) {
+      if (e.code === 'auth/popup-blocked' || e.code === 'auth/cancelled-popup-request') {
+        try { await signInWithRedirect(auth, provider); return { success: true }; }
+        catch (e2) { const msg = friendlyError(e2.code); setError(msg); return { success: false }; }
+      }
+      const msg = friendlyError(e.code); setError(msg); return { success: false };
+    }
+  }
+
+  async function signInMicrosoft() {
+    setError(null);
+    const provider = new OAuthProvider('microsoft.com');
+    provider.setCustomParameters({ prompt: 'select_account' });
+    try {
+      const result = await signInWithPopup(auth, provider);
+      if (result?.user) {
+        const name = result.user.displayName || result.user.email?.split('@')[0] || 'Joueur';
+        setPlayerName(name);
+        await initProfile(name);
+        setUser(result.user);
+      }
+      return { success: true };
+    } catch (e) {
+      if (e.code === 'auth/popup-blocked' || e.code === 'auth/cancelled-popup-request') {
+        try { await signInWithRedirect(auth, provider); return { success: true }; }
+        catch (e2) { const msg = friendlyError(e2.code); setError(msg); return { success: false }; }
+      }
+      const msg = friendlyError(e.code); setError(msg); return { success: false };
+    }
+  }
+
   async function logout() {
     await signOut(auth);
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, error, setError, signUpEmail, signInEmail, signInGoogle, signInGithub, logout }}>
+    <AuthContext.Provider value={{ user, loading, error, setError, signUpEmail, signInEmail, signInGoogle, signInGithub, signInFacebook, signInMicrosoft, logout }}>
       {children}
     </AuthContext.Provider>
   );
