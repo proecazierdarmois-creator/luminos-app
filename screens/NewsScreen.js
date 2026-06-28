@@ -237,8 +237,8 @@ const styles = StyleSheet.create({
   container:{flex:1}, safe:{flex:1,paddingHorizontal:16},
   title:{fontSize:22,fontWeight:'900',color:'#fff',letterSpacing:5,textAlign:'center',paddingTop:16,marginBottom:10},
   // Tabs
-  tabScroll:{gap:8,paddingBottom:10,paddingRight:16},
-  tabBtn:{borderWidth:1,borderColor:'#1e2d4a',borderRadius:12,paddingHorizontal:14,paddingVertical:8,backgroundColor:'#0d1220'},
+  tabScroll:{gap:8,paddingBottom:10,paddingRight:16,alignItems:'center',height:44},
+  tabBtn:{borderWidth:1,borderColor:'#1e2d4a',borderRadius:12,paddingHorizontal:14,paddingVertical:8,backgroundColor:'#0d1220',alignSelf:'flex-start'},
   tabText:{color:'#4a6080',fontSize:11,fontWeight:'700'},
   // Stats
   statsRow:{flexDirection:'row',gap:8,marginBottom:4},
