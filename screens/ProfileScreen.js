@@ -13,7 +13,7 @@ import { CREATURES, ALL_CREATURES, CREATURE_LIST } from '../data/creatures';
 import { subscribeToProfile, getTransactions, initProfile } from '../store/profileService';
 import { getPlayerId } from '../store/marketService';
 import { useAuth } from '../store/AuthContext';
-import { listenXp, getLevelFromXp, LEVEL_REWARDS } from '../store/xpService';
+import { listenXp, getLevelFromXp, LEVEL_REWARDS, addXp } from '../store/xpService';
 
 const { width: SW } = Dimensions.get('window');
 
@@ -211,7 +211,6 @@ export default function ProfileScreen() {
     if (ach.reward.crystals) addCrystals(ach.reward.crystals);
     const uid2 = user?.uid;
     if (uid2 && ach.reward.xp) {
-      const { addXp } = require('../store/xpService');
       addXp(uid2, ach.reward.xp, null, null, null).catch(()=>{});
     }
     if (ach.reward.creature && ALL_CREATURES[ach.reward.creature]) {
