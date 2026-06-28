@@ -125,18 +125,20 @@ function Podium({entries}) {
               )}
 
               {/* Nom */}
-              <Text style={[styles.podiumName,{color}]} numberOfLines={1}>{entry.name}</Text>
-              <Text style={styles.podiumScore}>{(entry.score||0).toLocaleString()} pts</Text>
+              <Text style={[styles.podiumName,{color,fontSize:isFirst?11:9}]} numberOfLines={1}>{entry.name}</Text>
+              <Text style={[styles.podiumScore,{color:color+'88'}]}>{(entry.score||0).toLocaleString()}</Text>
               <Text style={styles.podiumMedal}>{getMedal(rank)}</Text>
 
               {/* Bloc */}
-              <LinearGradient colors={[color+'44',color+'18']}
-                style={[styles.podiumBlock,{height:h,borderColor:color+'66'}]}>
-                {isFirst&&(
-                  <Animated.View style={[StyleSheet.absoluteFill,{backgroundColor:color,opacity:glowAnim.interpolate({inputRange:[0,1],outputRange:[0,0.06]}),borderRadius:12}]}/>
-                )}
-                <Text style={[styles.podiumRankNum,{color}]}>#{rank}</Text>
-                {entry.wins>0&&<Text style={styles.podiumWins}>⚔️ {entry.wins}</Text>}
+              <LinearGradient colors={[color+'55',color+'22']}
+                style={[styles.podiumBlock,{height:h,borderColor:color+'88'}]}>
+                <Animated.View style={[StyleSheet.absoluteFill,{
+                  backgroundColor:color,
+                  opacity:glowAnim.interpolate({inputRange:[0,1],outputRange:[0,isFirst?0.10:0.04]}),
+                  borderRadius:12,
+                }]}/>
+                <Text style={[styles.podiumRankNum,{color,fontSize:isFirst?18:14}]}>#{rank}</Text>
+                {entry.wins>0&&<Text style={styles.podiumWins}>⚔️ {entry.wins}V</Text>}
               </LinearGradient>
             </Animated.View>
           );
@@ -297,7 +299,7 @@ export default function LeaderboardScreen() {
           opacity:headerAnim,
           transform:[{translateY:headerAnim.interpolate({inputRange:[0,1],outputRange:[-20,0]})}],
         }}>
-          <Text style={styles.title}>TOP 100</Text>
+          <Text style={styles.title}>🏆 TOP 100</Text>
           <Text style={styles.subtitle}>Classement mondial · Temps réel</Text>
         </Animated.View>
 
@@ -329,14 +331,14 @@ export default function LeaderboardScreen() {
         {/* Filtres */}
         <View style={styles.filterRow}>
           {[
-            {key:'score',    label:'🏆 Score'},
-            {key:'wins',     label:'⚔️ Wins'},
-            {key:'creatures',label:'📖 Collec'},
-            {key:'shinys',   label:'✨ Shiny'},
+            {key:'score',    label:'🏆 Score',  color:'#ffd700'},
+            {key:'wins',     label:'⚔️ Wins',   color:'#39ff8f'},
+            {key:'creatures',label:'📖 Collec', color:'#00e5ff'},
+            {key:'shinys',   label:'✨ Shiny',  color:'#ff69b4'},
           ].map(f=>(
             <TouchableOpacity key={f.key} onPress={()=>handleFilter(f.key)}
-              style={[styles.filterBtn,filter===f.key&&styles.filterActive]}>
-              <Text style={[styles.filterText,filter===f.key&&styles.filterTextActive]}>{f.label}</Text>
+              style={[styles.filterBtn,filter===f.key&&{borderColor:f.color+'44',backgroundColor:f.color+'12'}]}>
+              <Text style={[styles.filterText,filter===f.key&&{color:f.color}]}>{f.label}</Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -388,7 +390,7 @@ const styles = StyleSheet.create({
   title:{fontSize:24,fontWeight:'900',color:'#fff',letterSpacing:6,textAlign:'center',paddingTop:16},
   subtitle:{fontSize:10,color:'#4a6080',letterSpacing:2,textAlign:'center',marginBottom:10},
   // Mon rang
-  myRankBox:{flexDirection:'row',alignItems:'center',borderWidth:1,borderRadius:18,padding:14,marginBottom:10,gap:10},
+  myRankBox:{flexDirection:'row',alignItems:'center',borderWidth:1.5,borderRadius:18,padding:14,marginBottom:10,gap:10},
   myRankLeft:{alignItems:'center',width:56,gap:2},
   myRankLabel:{fontSize:7,color:'#4a6080',letterSpacing:2,textTransform:'uppercase'},
   myRankNum:{fontSize:24,fontWeight:'900'},
@@ -413,7 +415,7 @@ const styles = StyleSheet.create({
   podiumRow:{flexDirection:'row',alignItems:'flex-end',justifyContent:'center',gap:6,paddingVertical:8,paddingHorizontal:4},
   podiumSlot:{flex:1,alignItems:'center',gap:3},
   crown:{fontSize:22,textAlign:'center'},
-  podiumName:{fontSize:9,fontWeight:'900',letterSpacing:0.5,textAlign:'center',width:'100%'},
+  podiumName:{fontWeight:'900',letterSpacing:0.5,textAlign:'center',width:'100%'},
   podiumScore:{fontSize:8,color:'#4a6080',textAlign:'center'},
   podiumMedal:{fontSize:26},
   podiumBlock:{width:'100%',borderWidth:1.5,borderRadius:12,alignItems:'center',justifyContent:'flex-end',paddingBottom:8,overflow:'hidden'},
@@ -424,13 +426,13 @@ const styles = StyleSheet.create({
   listLabel:{fontSize:9,color:'#4a6080',letterSpacing:4,textTransform:'uppercase',fontWeight:'700',marginBottom:6,marginTop:4},
   // Liste
   list:{gap:5,paddingBottom:24},
-  entry:{flexDirection:'row',alignItems:'center',borderWidth:1,borderRadius:14,paddingHorizontal:12,paddingVertical:10,gap:10,minHeight:64},
+  entry:{flexDirection:'row',alignItems:'center',borderWidth:1,borderRadius:14,paddingHorizontal:12,paddingVertical:12,gap:10,minHeight:68},
   rankCol:{alignItems:'center',width:36,gap:1},
   entryMedal:{fontSize:16},
   rankNum:{fontSize:9,fontWeight:'800',letterSpacing:1},
   infoCol:{flex:1,gap:3},
   nameRow:{flexDirection:'row',alignItems:'center',gap:6},
-  entryName:{fontSize:13,fontWeight:'800',color:'#c8daf0',flex:1,flexShrink:1},
+  entryName:{fontSize:13,fontWeight:'900',color:'#c8daf0',flex:1,flexShrink:1},
   youBadge:{backgroundColor:'#00e5ff22',borderWidth:1,borderColor:'#00e5ff44',borderRadius:6,paddingHorizontal:5,paddingVertical:1},
   youText:{color:'#00e5ff',fontSize:7,fontWeight:'900',letterSpacing:1},
   entryStats:{flexDirection:'row',gap:8},
