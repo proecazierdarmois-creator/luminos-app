@@ -1,5 +1,7 @@
 // App.js — V16 avec Admin + Firebase Sync
 import React from 'react';
+import { inject } from '@vercel/analytics';
+inject();
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { View, Text, ActivityIndicator } from 'react-native';

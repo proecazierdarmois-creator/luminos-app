@@ -59,6 +59,12 @@ export default function AdminScreen() {
   const [guilds, setGuilds] = useState([]);
   const [showGuildReset, setShowGuildReset] = useState(false);
   const [guildSearch, setGuildSearch] = useState('');
+  const [analyticsData, setAnalyticsData] = useState({
+    newPlayersToday:0, newPlayersWeek:0,
+    activeToday:[], activeWeek:[],
+    topCreatures:{}, totalTrades:0,
+    avgCrystals:0, avgWins:0,
+  });
   const [newsList, setNewsList] = useState([]);
   const [newsTitle, setNewsTitle] = useState('');
   const [newsContent, setNewsContent] = useState('');
@@ -83,6 +89,25 @@ export default function AdminScreen() {
       } else setNewsList([]);
     });
     return unsubNews;
+  },[]);
+
+  useEffect(()=>{
+    // Analytics — calcul depuis les données joueurs
+    const unsubAnalytics = onValue(ref(db,'players'),snap=>{
+      if (!snap.exists()) return;
+      const list = []; snap.forEach(c=>list.push({uid:c.key,...c.val()}));
+      const now = Date.now();
+      const oneDayAgo  = now - 86400000;
+      const oneWeekAgo = now - 7*86400000;
+      const newToday = list.filter(p=>(p.createdAt||0)>oneDayAgo).length;
+      const newWeek  = list.filter(p=>(p.createdAt||0)>oneWeekAgo).length;
+      const activeToday = list.filter(p=>(p.lastSeen||p.updatedAt||0)>oneDayAgo);
+      const activeWeek  = list.filter(p=>(p.lastSeen||p.updatedAt||0)>oneWeekAgo);
+      const avgCrystals = list.length ? Math.round(list.reduce((a,p)=>a+(p.crystalsEarned||0),0)/list.length) : 0;
+      const avgWins     = list.length ? Math.round(list.reduce((a,p)=>a+(p.wins||0),0)/list.length) : 0;
+      setAnalyticsData(prev=>({...prev,newPlayersToday:newToday,newPlayersWeek:newWeek,activeToday,activeWeek,avgCrystals,avgWins}));
+    });
+    return unsubAnalytics;
   },[]);
 
   useEffect(()=>{
@@ -317,7 +342,7 @@ export default function AdminScreen() {
 
         {/* Tabs */}
         <View style={styles.tabRow}>
-          {['Stats','Joueurs','News','Mon compte'].map(t=>(
+          {['Stats','Joueurs','News','Analytics','Mon compte'].map(t=>(
             <TouchableOpacity key={t} onPress={()=>setTab(t)}
               style={[styles.tabBtn,tab===t&&styles.tabActive]}>
               <Text style={[styles.tabText,tab===t&&styles.tabTextActive]}>{t}</Text>
@@ -599,6 +624,102 @@ export default function AdminScreen() {
             </>
           )}
 
+          {/* ── ANALYTICS ── */}
+          {tab==='Analytics'&&(
+            <>
+              <Text style={styles.sectionLabel}>📊 ANALYTICS JOUEURS</Text>
+
+              {/* Nouveaux joueurs */}
+              <View style={styles.analyticsGrid}>
+                <LinearGradient colors={['#0d1a2e','#07090f']} style={[styles.analyticsCard,{borderColor:'#00e5ff33'}]}>
+                  <Text style={styles.analyticsEmoji}>🆕</Text>
+                  <Text style={[styles.analyticsVal,{color:'#00e5ff'}]}>{analyticsData.newPlayersToday}</Text>
+                  <Text style={styles.analyticsLbl}>Nouveaux aujourd'hui</Text>
+                </LinearGradient>
+                <LinearGradient colors={['#0d1a2e','#07090f']} style={[styles.analyticsCard,{borderColor:'#39ff8f33'}]}>
+                  <Text style={styles.analyticsEmoji}>📅</Text>
+                  <Text style={[styles.analyticsVal,{color:'#39ff8f'}]}>{analyticsData.newPlayersWeek}</Text>
+                  <Text style={styles.analyticsLbl}>Nouveaux cette semaine</Text>
+                </LinearGradient>
+                <LinearGradient colors={['#0d1a2e','#07090f']} style={[styles.analyticsCard,{borderColor:'#ffd70033'}]}>
+                  <Text style={styles.analyticsEmoji}>⚡</Text>
+                  <Text style={[styles.analyticsVal,{color:'#ffd700'}]}>{analyticsData.activeToday.length}</Text>
+                  <Text style={styles.analyticsLbl}>Actifs aujourd'hui</Text>
+                </LinearGradient>
+                <LinearGradient colors={['#0d1a2e','#07090f']} style={[styles.analyticsCard,{borderColor:'#bf5fff33'}]}>
+                  <Text style={styles.analyticsEmoji}>🔥</Text>
+                  <Text style={[styles.analyticsVal,{color:'#bf5fff'}]}>{analyticsData.activeWeek.length}</Text>
+                  <Text style={styles.analyticsLbl}>Actifs cette semaine</Text>
+                </LinearGradient>
+              </View>
+
+              {/* Moyennes */}
+              <Text style={styles.sectionLabel}>📈 MOYENNES PAR JOUEUR</Text>
+              <View style={styles.appInfoCard}>
+                <View style={styles.infoRow}>
+                  <Text style={styles.infoLabel}>💎 Cristaux moyens gagnés</Text>
+                  <Text style={[styles.infoVal,{color:'#ffd700'}]}>{analyticsData.avgCrystals}</Text>
+                </View>
+                <View style={styles.infoRow}>
+                  <Text style={styles.infoLabel}>⚔️ Victoires moyennes</Text>
+                  <Text style={[styles.infoVal,{color:'#39ff8f'}]}>{analyticsData.avgWins}</Text>
+                </View>
+                <View style={styles.infoRow}>
+                  <Text style={styles.infoLabel}>👥 Total joueurs inscrits</Text>
+                  <Text style={[styles.infoVal,{color:'#00e5ff'}]}>{globalStats.players}</Text>
+                </View>
+                <View style={styles.infoRow}>
+                  <Text style={styles.infoLabel}>⚔️ Total victoires</Text>
+                  <Text style={[styles.infoVal,{color:'#39ff8f'}]}>{globalStats.totalWins}</Text>
+                </View>
+                <View style={styles.infoRow}>
+                  <Text style={styles.infoLabel}>✦ Total invocations</Text>
+                  <Text style={[styles.infoVal,{color:'#bf5fff'}]}>{globalStats.totalSummons}</Text>
+                </View>
+              </View>
+
+              {/* Joueurs actifs aujourd'hui */}
+              <Text style={styles.sectionLabel}>⚡ ACTIFS AUJOURD'HUI ({analyticsData.activeToday.length})</Text>
+              {analyticsData.activeToday.length===0
+                ?<Text style={styles.emptyText}>Aucun joueur actif aujourd'hui</Text>
+                :analyticsData.activeToday.slice(0,10).map(p=>(
+                  <View key={p.uid} style={[styles.topRow,{borderColor:'#ffd70022'}]}>
+                    <View style={styles.topAvatar}>
+                      <Text style={styles.topAvatarText}>{p.name?.[0]?.toUpperCase()||'?'}</Text>
+                    </View>
+                    <Text style={[styles.topName]}>{p.name}{p.uid===ADMIN_UID?' 👑':''}</Text>
+                    <Text style={[styles.topWins,{color:'#ffd700'}]}>{p.crystalsEarned||0} 💎</Text>
+                  </View>
+                ))
+              }
+
+              {/* Rétention */}
+              <Text style={styles.sectionLabel}>📉 RÉTENTION</Text>
+              <View style={styles.appInfoCard}>
+                <View style={styles.infoRow}>
+                  <Text style={styles.infoLabel}>Taux actifs / total (7j)</Text>
+                  <Text style={[styles.infoVal,{color:analyticsData.activeWeek.length/Math.max(1,globalStats.players)>0.3?'#39ff8f':'#ff4444'}]}>
+                    {globalStats.players>0?Math.round((analyticsData.activeWeek.length/globalStats.players)*100):0}%
+                  </Text>
+                </View>
+                <View style={styles.infoRow}>
+                  <Text style={styles.infoLabel}>Taux actifs / total (1j)</Text>
+                  <Text style={[styles.infoVal,{color:analyticsData.activeToday.length/Math.max(1,globalStats.players)>0.1?'#39ff8f':'#ff4444'}]}>
+                    {globalStats.players>0?Math.round((analyticsData.activeToday.length/globalStats.players)*100):0}%
+                  </Text>
+                </View>
+                <View style={styles.infoRow}>
+                  <Text style={styles.infoLabel}>Joueurs avec victoires</Text>
+                  <Text style={[styles.infoVal,{color:'#39ff8f'}]}>{players.filter(p=>p.wins>0).length}</Text>
+                </View>
+                <View style={styles.infoRow}>
+                  <Text style={styles.infoLabel}>Joueurs sans victoire</Text>
+                  <Text style={[styles.infoVal,{color:'#ff4444'}]}>{players.filter(p=>!(p.wins>0)).length}</Text>
+                </View>
+              </View>
+            </>
+          )}
+
           {/* ── MON COMPTE ── */}
           {tab==='Mon compte'&&(
             <>
@@ -821,6 +942,11 @@ const styles = StyleSheet.create({
   guildResetBtn:{backgroundColor:'#ff444422',borderWidth:1,borderColor:'#ff444444',borderRadius:10,paddingHorizontal:12,paddingVertical:6},
   guildResetBtnText:{color:'#ff6666',fontSize:12,fontWeight:'800'},
   newsRow:{flexDirection:'row',alignItems:'center',gap:10,backgroundColor:'#0d1220',borderWidth:1,borderRadius:14,padding:12},
+  analyticsGrid:{flexDirection:'row',flexWrap:'wrap',gap:8},
+  analyticsCard:{flex:1,minWidth:'45%',borderWidth:1,borderRadius:14,padding:12,alignItems:'center',gap:4},
+  analyticsEmoji:{fontSize:22},
+  analyticsVal:{fontSize:22,fontWeight:'900'},
+  analyticsLbl:{fontSize:8,color:'#4a6080',letterSpacing:1,textTransform:'uppercase',textAlign:'center'},
   newsRowTitle:{fontSize:13,fontWeight:'700'},
   newsRowDate:{color:'#4a6080',fontSize:10},
   newsDeleteBtn:{backgroundColor:'#ff444422',borderWidth:1,borderColor:'#ff444433',borderRadius:8,paddingHorizontal:10,paddingVertical:6},
