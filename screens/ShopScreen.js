@@ -574,7 +574,7 @@ export default function ShopScreen() {
               </View>
             ) : (
               <>
-                <LinearGradient colors={['#0d1a2e','#07090f']} style={styles.marketHeader}>
+                <LinearGradient colors={['#0d1a2e','#07090f']} style={[styles.marketHeader,{borderColor:'#ffd70022'}]}>
                   <View>
                     <Text style={styles.marketBalanceLbl}>SOLDE</Text>
                     <Text style={styles.marketBalance}>💎 {crystals}</Text>
@@ -599,22 +599,30 @@ export default function ShopScreen() {
                         const c=ALL_CREATURES[l.creature?.id];
                         const Sprite=SPRITES[l.creature?.id?.replace('_shiny','')]||SPRITES.lumikos;
                         return (
-                          <LinearGradient key={l.id} colors={c?.bgGradient||['#0d1220','#07090f']}
-                            style={[styles.listingCard,{borderColor:c?.rarityColor+'44'}]}>
-                            <View style={styles.listingLeft}><Sprite size={54}/></View>
-                            <View style={styles.listingMid}>
-                              <Text style={[styles.listingName,{color:c?.rarityColor}]}>{c?.name}</Text>
-                              <Text style={[styles.listingRarity,{color:c?.rarityColor+'88'}]}>{c?.rarityLabel}</Text>
-                              <Text style={styles.listingSeller}>par {l.sellerName}</Text>
-                            </View>
-                            <View style={styles.listingRight}>
-                              <Text style={[styles.listingPrice,{color:crystals>=l.price?'#ffd700':'#ff4444'}]}>💎 {l.price}</Text>
-                              <TouchableOpacity onPress={()=>setBuyTarget(l)}
-                                style={[styles.buyMarketBtn,crystals<l.price&&styles.disabled,{borderColor:c?.rarityColor+'55',backgroundColor:c?.rarityColor+'18'}]} disabled={crystals<l.price}>
-                                <Text style={[styles.buyMarketBtnText,{color:c?.rarityColor}]}>Acheter</Text>
-                              </TouchableOpacity>
-                            </View>
-                          </LinearGradient>
+                          <TouchableOpacity key={l.id} onPress={()=>setBuyTarget(l)} disabled={crystals<l.price}>
+                            <LinearGradient colors={c?.bgGradient||['#0d1220','#07090f']}
+                              style={[styles.listingCard,{borderColor:c?.rarityColor+(crystals>=l.price?'66':'22')}]}>
+                              {/* Shimmer */}
+                              <View style={[StyleSheet.absoluteFill,{borderRadius:16,overflow:'hidden'}]}>
+                                <LinearGradient colors={['rgba(255,255,255,0.04)','rgba(255,255,255,0)']}
+                                  start={{x:0,y:0}} end={{x:1,y:1}} style={{flex:1}}/>
+                              </View>
+                              <View style={styles.listingLeft}><Sprite size={58}/></View>
+                              <View style={styles.listingMid}>
+                                <Text style={[styles.listingName,{color:c?.rarityColor}]}>{c?.name}</Text>
+                                <View style={[styles.listingRarityBadge,{backgroundColor:c?.rarityColor+'18',borderColor:c?.rarityColor+'33'}]}>
+                                  <Text style={[styles.listingRarity,{color:c?.rarityColor}]}>{c?.rarityLabel}</Text>
+                                </View>
+                                <Text style={styles.listingSeller}>👤 {l.sellerName}</Text>
+                              </View>
+                              <View style={styles.listingRight}>
+                                <Text style={[styles.listingPrice,{color:crystals>=l.price?'#ffd700':'#ff4444'}]}>💎 {l.price}</Text>
+                                <View style={[styles.buyMarketBtn,crystals<l.price&&styles.disabled,{borderColor:c?.rarityColor+'55',backgroundColor:c?.rarityColor+'22'}]}>
+                                  <Text style={[styles.buyMarketBtnText,{color:c?.rarityColor}]}>{crystals>=l.price?'Acheter':'Insuffisant'}</Text>
+                                </View>
+                              </View>
+                            </LinearGradient>
+                          </TouchableOpacity>
                         );
                       })
                   )}
@@ -624,16 +632,18 @@ export default function ShopScreen() {
                         const c=ALL_CREATURES[l.creature?.id];
                         const Sprite=SPRITES[l.creature?.id?.replace('_shiny','')]||SPRITES.lumikos;
                         return (
-                          <View key={l.id} style={[styles.listingCard,{borderColor:c?.rarityColor+'33'}]}>
-                            <View style={styles.listingLeft}><Sprite size={50}/></View>
+                          <LinearGradient key={l.id} colors={c?.bgGradient||['#0d1220','#07090f']}
+                            style={[styles.listingCard,{borderColor:c?.rarityColor+'44'}]}>
+                            <View style={styles.listingLeft}><Sprite size={54}/></View>
                             <View style={styles.listingMid}>
                               <Text style={[styles.listingName,{color:c?.rarityColor}]}>{c?.name}</Text>
-                              <Text style={styles.listingPrice}>💎 {l.price}</Text>
+                              <Text style={[styles.listingPrice,{color:'#ffd700'}]}>💎 {l.price}</Text>
+                              <View style={[styles.pendingBadge]}><Text style={styles.pendingText}>⏳ En attente</Text></View>
                             </View>
                             <TouchableOpacity onPress={()=>removeListing(l.id)} style={[styles.actionBtn,{borderColor:'#ff444444',backgroundColor:'#ff444415'}]}>
-                              <Text style={[styles.actionBtnText,{color:'#ff4444'}]}>Annuler</Text>
+                              <Text style={[styles.actionBtnText,{color:'#ff4444'}]}>✕ Annuler</Text>
                             </TouchableOpacity>
-                          </View>
+                          </LinearGradient>
                         );
                       })
                   )}
@@ -851,7 +861,10 @@ const styles = StyleSheet.create({
   listingLeft:{width:56,alignItems:'center'},
   listingMid:{flex:1,gap:2},
   listingName:{fontSize:13,fontWeight:'800'},
-  listingRarity:{fontSize:9,color:'#4a6080'},
+  listingRarity:{fontSize:8,fontWeight:'700'},
+  listingRarityBadge:{borderWidth:1,borderRadius:6,paddingHorizontal:6,paddingVertical:2,alignSelf:'flex-start'},
+  pendingBadge:{backgroundColor:'#ffd70018',borderWidth:1,borderColor:'#ffd70033',borderRadius:6,paddingHorizontal:6,paddingVertical:2,alignSelf:'flex-start'},
+  pendingText:{color:'#ffd700',fontSize:8,fontWeight:'700'},
   listingSeller:{fontSize:10,color:'#4a6080'},
   listingRight:{alignItems:'center',gap:6},
   listingPrice:{fontSize:13,fontWeight:'900',color:'#ffd700'},
