@@ -13,6 +13,7 @@ import { SPRITES } from '../components/CreatureCard';
 import { ALL_CREATURES, CREATURE_LIST } from '../data/creatures';
 import { listenXp, getLevelFromXp, LEVEL_REWARDS } from '../store/xpService';
 import { useNavigation } from '@react-navigation/native';
+import { onValue as fbOnValue } from 'firebase/database';
 import { useTheme } from '../store/ThemeContext';
 
 const { width: SW } = Dimensions.get('window');
@@ -69,6 +70,7 @@ export default function HomeScreen() {
   const [dailyDone, setDailyDone]     = useState(0);
   const [eclipseActive, setEclipseActive] = useState(false);
   const [nextEgg, setNextEgg]         = useState(null);
+  const [inboxCount, setInboxCount]   = useState(0);
 
   const greetAnim = useRef(new Animated.Value(0)).current;
   const cardAnim  = useRef(new Animated.Value(0)).current;
@@ -117,6 +119,14 @@ export default function HomeScreen() {
       new Date(`${now.getFullYear()}-09-22`),new Date(`${now.getFullYear()}-12-21`),
     ];
     setEclipseActive(eclipseDates.some(d=>Math.abs(now-d)/3600000<48));
+    // Inbox
+    const unsubInbox = onValue(ref(db,`inbox/${uid}`),snap=>{
+      if (snap.exists()) {
+        const msgs = Object.values(snap.val());
+        const unclaimed = msgs.filter(m=>!m.claimed&&(!m.expiresAt||Date.now()<m.expiresAt)&&(m.crystals||m.xp)).length;
+        setInboxCount(unclaimed);
+      } else setInboxCount(0);
+    });
     onValue(ref(db,`breeding/${uid}/eggs`),snap=>{
       if (snap.exists()) {
         const eggs=Object.values(snap.val());
@@ -176,11 +186,21 @@ export default function HomeScreen() {
                   </View>}
                 </View>
               </View>
-              {eclipseActive&&(
-                <Animated.View style={[styles.eclipseBadge,{transform:[{scale:pulseAnim}]}]}>
-                  <Text style={styles.eclipseBadgeText}>🌑 ÉCLIPSE</Text>
-                </Animated.View>
-              )}
+              <View style={{flexDirection:'row',gap:8,alignItems:'flex-start'}}>
+                {eclipseActive&&(
+                  <Animated.View style={[styles.eclipseBadge,{transform:[{scale:pulseAnim}]}]}>
+                    <Text style={styles.eclipseBadgeText}>🌑 ÉCLIPSE</Text>
+                  </Animated.View>
+                )}
+                <TouchableOpacity onPress={()=>navigation.navigate('Inbox')} style={styles.bellBtn}>
+                  <Text style={styles.bellEmoji}>🔔</Text>
+                  {inboxCount>0&&(
+                    <View style={styles.bellBadge}>
+                      <Text style={styles.bellBadgeText}>{inboxCount}</Text>
+                    </View>
+                  )}
+                </TouchableOpacity>
+              </View>
             </View>
           </Animated.View>
 
@@ -381,6 +401,10 @@ const styles = StyleSheet.create({
   guildText:{fontSize:10,color:'#ff6b35',fontWeight:'700'},
   eclipseBadge:{backgroundColor:'#bf5fff22',borderWidth:1,borderColor:'#bf5fff55',borderRadius:12,paddingHorizontal:10,paddingVertical:6},
   eclipseBadgeText:{color:'#bf5fff',fontSize:11,fontWeight:'900',letterSpacing:1},
+  bellBtn:{position:'relative',width:40,height:40,borderRadius:20,backgroundColor:'#0d1220',borderWidth:1,borderColor:'#1e2d4a',alignItems:'center',justifyContent:'center'},
+  bellEmoji:{fontSize:18},
+  bellBadge:{position:'absolute',top:-4,right:-4,backgroundColor:'#ff4fa3',borderRadius:8,minWidth:16,height:16,alignItems:'center',justifyContent:'center',paddingHorizontal:3},
+  bellBadgeText:{color:'#000',fontSize:8,fontWeight:'900'},
   // XP
   xpCard:{borderWidth:1,borderColor:'#00e5ff22',borderRadius:18,padding:16},
   xpHeader:{flexDirection:'row',alignItems:'center',gap:12},

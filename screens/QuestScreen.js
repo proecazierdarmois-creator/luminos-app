@@ -10,6 +10,7 @@ import { ref, set, onValue } from 'firebase/database';
 import { useGameStore } from '../store/useGameStore';
 import { useAuth } from '../store/AuthContext';
 import { addXp, XP_REWARDS } from '../store/xpService';
+import { useToast } from '../store/ToastContext';
 import { auth } from '../config/firebase';
 
 const { width: SW } = Dimensions.get('window');
@@ -222,6 +223,7 @@ function QuestCard({quest,progress,claimed,onClaim,isBonus,isWeekly,index=0}) {
 // ─── QuestScreen ─────────────────────────────────────────────────
 export default function QuestScreen() {
   const { collection, wins, summonCount, crystals, addCrystals } = useGameStore();
+  const { showToast } = useToast();
   const authCtx = useAuth();
   const uid     = authCtx?.user?.uid||'guest';
 
@@ -285,6 +287,7 @@ export default function QuestScreen() {
     const uid2 = auth.currentUser?.uid;
     if (uid2) addXp(uid2,quest.xp,null,null,null);
     await saveFirebase(newClaimed,newEarned,newProg);
+    showToast({type:'quest',title:'Quête complétée !',message:quest.label,crystals:quest.reward,xp:quest.xp,duration:3500});
     // All done ?
     const allDone = allDailyQuests.every(q=>calcProgress(q,gameData,newProg[q.id])>=q.target&&newClaimed[q.id]);
     if (allDone) Animated.spring(completeAnim,{toValue:1,friction:3,useNativeDriver:true}).start();

@@ -10,6 +10,8 @@ import { ref, set, get, onValue } from 'firebase/database';
 import { useGameStore } from '../store/useGameStore';
 import { useAuth } from '../store/AuthContext';
 import { addXp } from '../store/xpService';
+import { useToast } from '../store/ToastContext';
+import { sendInboxMessage } from './InboxScreen';
 import { auth } from '../config/firebase';
 
 const { width: SW } = Dimensions.get('window');
@@ -200,6 +202,7 @@ function ChallengeCard({ch, myGuild, myGuildId, contributions, claimed, gameData
 // ─── GuildChallengeScreen ─────────────────────────────────────────
 export default function GuildChallengeScreen() {
   const {wins,summonCount,collection,crystals,addCrystals} = useGameStore();
+  const { showToast } = useToast();
   const authCtx  = useAuth();
   const user     = authCtx?.user;
   const uid      = user?.uid||'guest';
@@ -294,6 +297,17 @@ export default function GuildChallengeScreen() {
     setClaimed(newClaimed);
     await set(ref(db,`guildChallenges/claimed/${dateKey}/${uid}`),newClaimed);
     showFeedback(`✓ +${reward.crystals} 💎 · +${reward.xp} XP récupérés !`);
+    showToast({type:'guild',title:'Défi de guilde complété !',message:`${reward.label} — ${ch.label}`,crystals:reward.crystals,xp:reward.xp,duration:4000});
+    if (auth.currentUser?.uid) {
+      sendInboxMessage(auth.currentUser.uid,{
+        type:'guild',
+        title:`🏆 Récompense défi — ${ch.label}`,
+        description:`Tu as terminé "${ch.label}" avec ta guilde.`,
+        crystals:reward.crystals,
+        xp:reward.xp,
+        expiresIn:3*86400000,
+      });
+    }
   }
 
   // Pas de guilde

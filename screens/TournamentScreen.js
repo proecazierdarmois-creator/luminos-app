@@ -12,6 +12,8 @@ import { useAuth } from '../store/AuthContext';
 import { SPRITES } from '../components/CreatureCard';
 import { ALL_CREATURES, CREATURE_LIST } from '../data/creatures';
 import { addXp, XP_REWARDS } from '../store/xpService';
+import { useToast } from '../store/ToastContext';
+import { sendInboxMessage } from './InboxScreen';
 import { auth } from '../config/firebase';
 
 const { width: SW } = Dimensions.get('window');
@@ -171,6 +173,7 @@ function MatchCard({match,myId,isLive}) {
 // ─── TournamentScreen ─────────────────────────────────────────────
 export default function TournamentScreen() {
   const { collection, crystals, addCrystals } = useGameStore();
+  const { showToast } = useToast();
   const authCtx  = useAuth();
   const user     = authCtx?.user;
   const myId     = user?.uid || 'guest';
