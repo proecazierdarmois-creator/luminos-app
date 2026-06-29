@@ -7,7 +7,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { useGameStore } from '../store/useGameStore';
 import { SPRITES } from '../components/CreatureCard';
-import { ALL_CREATURES, CREATURES, CREATURE_LIST } from '../data/creatures';
+import { ALL_CREATURES, CREATURES, CREATURE_LIST, EXCLUSIVE_CREATURES } from '../data/creatures';
 
 const { width: SW } = Dimensions.get('window');
 const CARD_W = (SW - 48) / 3;
@@ -21,6 +21,7 @@ const FILTERS = [
   { id:'rare',      label:'Rare',        color:'#bf5fff' },
   { id:'legendary', label:'Légendaire',  color:'#ffd700' },
   { id:'shiny',     label:'✨ Shiny',    color:'#ff69b4' },
+  { id:'exclusive',  label:'⭐ Exclusif', color:'#bf5fff' },
 ];
 
 const SORTS = [
@@ -30,7 +31,7 @@ const SORTS = [
   { id:'owned',  label:'Quantité' },
 ];
 
-const RARITY_ORDER = { common:0, uncommon:1, rare:2, legendary:3 };
+const RARITY_ORDER = { common:0, uncommon:1, rare:2, legendary:3, exclusive:4 };
 
 // ─── Carte créature ───────────────────────────────────────────────
 function CreatureGridCard({ item, onPress, index=0 }) {
@@ -91,6 +92,10 @@ function CreatureGridCard({ item, onPress, index=0 }) {
         {item.rarity==='legendary'&&isOwned&&(
           <View style={styles.legBadge}><Text style={styles.legBadgeText}>★</Text></View>
         )}
+        {/* Exclusif */}
+        {item.rarity==='exclusive'&&isOwned&&(
+          <View style={[styles.legBadge,{bottom:22,right:4}]}><Text style={[styles.legBadgeText,{color:'#bf5fff'}]}>⭐</Text></View>
+        )}
 
         {/* Lock */}
         {!isOwned&&(
@@ -142,6 +147,7 @@ function DetailModal({ creature, onClose }) {
                 <View style={{flexDirection:'row',gap:6}}>
                   {creature.isShiny&&<View style={styles.modalShinyBadge}><Text style={styles.modalShinyText}>✨ SHINY</Text></View>}
                   {creature.rarity==='legendary'&&<View style={styles.modalLegBadge}><Text style={styles.modalLegText}>★ LÉGENDAIRE</Text></View>}
+                  {creature.rarity==='exclusive'&&<View style={[styles.modalLegBadge,{backgroundColor:'#bf5fff22',borderColor:'#bf5fff44'}]}><Text style={[styles.modalLegText,{color:'#bf5fff'}]}>⭐ EXCLUSIF</Text></View>}
                 </View>
               </View>
 
@@ -249,13 +255,15 @@ export default function CollectionScreen() {
   },[]);
 
   const uniqueOwned    = new Set(collection.map(c=>c.id)).size;
-  const totalCreatures = CREATURE_LIST.length;
+  const totalCreatures = CREATURE_LIST.length + Object.keys(EXCLUSIVE_CREATURES).length;
   const shinysOwned    = collection.filter(c=>c.isShiny).length;
   const legendsOwned   = new Set(collection.filter(c=>CREATURES[c.id]?.rarity==='legendary').map(c=>c.id)).size;
   const pct = Math.round((uniqueOwned/totalCreatures)*100);
   const completionColor = pct>=80?'#39ff8f':pct>=50?'#ffd700':'#00e5ff';
 
-  const pokedex = CREATURE_LIST.map(c=>({
+  const exclusiveList = Object.values(EXCLUSIVE_CREATURES);
+  const fullList = [...CREATURE_LIST, ...exclusiveList];
+  const pokedex = fullList.map(c=>({
     ...c,
     owned:collection.filter(x=>x.id===c.id).length,
     isShiny:collection.some(x=>x.id===c.id&&x.isShiny),
@@ -271,6 +279,7 @@ export default function CollectionScreen() {
       case 'rare':      return c.rarity==='rare';
       case 'legendary': return c.rarity==='legendary';
       case 'shiny':     return collection.some(x=>x.id===c.id&&x.isShiny);
+      case 'exclusive':  return c.rarity==='exclusive';
       default:          return true;
     }
   });
