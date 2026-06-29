@@ -10,6 +10,7 @@ import { ref, onValue, set, remove, push, get } from 'firebase/database';
 import { useAuth } from '../store/AuthContext';
 import { useNavigation } from '@react-navigation/native';
 import { useGameStore } from '../store/useGameStore';
+import { ALL_CREATURES } from '../data/creatures';
 import { addXp } from '../store/xpService';
 import { auth } from '../config/firebase';
 
@@ -153,6 +154,9 @@ export default function InboxScreen() {
     if (msg.crystals) addCrystals(msg.crystals);
     const uid2 = auth.currentUser?.uid;
     if (uid2 && msg.xp) addXp(uid2,msg.xp,null,null,null).catch(()=>{});
+    if (msg.creatureId && ALL_CREATURES[msg.creatureId]) {
+      addToCollection({...ALL_CREATURES[msg.creatureId], uid:`inbox_${msg.id}_${Date.now()}`});
+    }
     // Marquer comme réclamé
     await set(ref(db,`inbox/${uid}/${msg.id}/claimed`),true).catch(()=>{});
     showFeedback(`✓ Récompenses récupérées !`);

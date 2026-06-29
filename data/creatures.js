@@ -505,6 +505,87 @@ export const VOLTARIS = {
   evolvesFrom: 'voltrax',
 };
 
+// ─── CRÉATURES EXCLUSIVES ────────────────────────────────────────
+// Uniquement obtenables via codes secrets ou events admin
+
+export const EXCLUSIVE_CREATURES = {
+
+  // 🌌 COSMIQUE
+  astralis: {
+    id: 'astralis', number: '#EX001', name: 'ASTRALIS', jp: 'アストラリス',
+    type: 'Cosmique · Étoile', rarity: 'exclusive', rarityLabel: '★ Exclusif', rarityColor: '#aaeeff',
+    isExclusive: true,
+    description: "Né au cœur d'une nébuleuse. Son corps est fait de poussière d'étoiles et de lumière primordiale.",
+    color: '#aaeeff', accentColor: '#ddf8ff', bgGradient: ['#000820', '#001030'],
+    stats: { hp: 160, maxHp: 160, atk: 135, def: 115, spd: 120 },
+    moves: [
+      { name: 'Supernova',      power: 80, type: 'cosmic' },
+      { name: "Pluie d'Étoiles", power: 70, type: 'cosmic' },
+    ],
+    dropRate: 0,
+  },
+
+  // 🎃 HALLOWEEN
+  phanteros: {
+    id: 'phanteros', number: '#EX002', name: 'PHANTEROS', jp: 'ファントロス',
+    type: 'Fantôme · Ténèbres', rarity: 'exclusive', rarityLabel: '🎃 Halloween', rarityColor: '#ff6b00',
+    isExclusive: true,
+    description: "Apparaît uniquement la nuit d'Halloween. Son rire résonne dans les couloirs vides.",
+    color: '#ff6b00', accentColor: '#ffaa44', bgGradient: ['#150800', '#250c00'],
+    stats: { hp: 145, maxHp: 145, atk: 140, def: 85, spd: 130 },
+    moves: [
+      { name: 'Terreur Nocturne', power: 75, type: 'ghost' },
+      { name: 'Malédiction',      power: 65, type: 'shadow' },
+    ],
+    dropRate: 0,
+  },
+
+  // 🐉 MYTHOLOGIQUE
+  drakovyr: {
+    id: 'drakovyr', number: '#EX003', name: 'DRAKOVYR', jp: 'ドラコヴィル',
+    type: 'Dragon · Légendaire', rarity: 'exclusive', rarityLabel: '🐉 Mythique', rarityColor: '#cc2200',
+    isExclusive: true,
+    description: "Le dragon primordial. Existait avant le monde lui-même. Sa chaleur peut fondre les continents.",
+    color: '#cc2200', accentColor: '#ff6633', bgGradient: ['#150000', '#250400'],
+    stats: { hp: 175, maxHp: 175, atk: 155, def: 110, spd: 105 },
+    moves: [
+      { name: 'Feu Primordial',   power: 85, type: 'fire' },
+      { name: 'Rugissement Myth.', power: 75, type: 'dragon' },
+    ],
+    dropRate: 0,
+  },
+
+  // ❄️ NOËL
+  frostael: {
+    id: 'frostael', number: '#EX004', name: 'FROSTAEL', jp: 'フロスタエル',
+    type: 'Glace · Lumière', rarity: 'exclusive', rarityLabel: '❄️ Noël', rarityColor: '#aaddff',
+    isExclusive: true,
+    description: "Le gardien de l'hiver éternel. Apporte la neige là où il passe et réchauffe les cœurs.",
+    color: '#aaddff', accentColor: '#ffffff', bgGradient: ['#001020', '#002040'],
+    stats: { hp: 150, maxHp: 150, atk: 120, def: 130, spd: 110 },
+    moves: [
+      { name: 'Tempête de Noël',  power: 72, type: 'ice' },
+      { name: 'Lumière Hivernale', power: 62, type: 'light' },
+    ],
+    dropRate: 0,
+  },
+
+  // 🌸 ÉTÉ / PHÉNIX
+  solaryx: {
+    id: 'solaryx', number: '#EX005', name: 'SOLARYX', jp: 'ソラリクス',
+    type: 'Feu · Solaire · Mythique', rarity: 'exclusive', rarityLabel: '🔥 Phénix', rarityColor: '#ffaa00',
+    isExclusive: true,
+    description: "Le phénix solaire. Renaît de ses cendres chaque solstice d'été. Sa chaleur donne la vie.",
+    color: '#ffaa00', accentColor: '#ffdd44', bgGradient: ['#200800', '#301200'],
+    stats: { hp: 155, maxHp: 155, atk: 145, def: 100, spd: 140 },
+    moves: [
+      { name: 'Renaissance Solaire', power: 82, type: 'fire' },
+      { name: 'Aile de Phénix',      power: 72, type: 'solar' },
+    ],
+    dropRate: 0,
+  },
+};
+
 // ─── EXPORTS FINAUX (après toutes les définitions) ────────────────
 // Ajoute les évolutions V2 à CREATURES
 Object.assign(CREATURES, {
@@ -513,7 +594,7 @@ Object.assign(CREATURES, {
   floriva: FLORIVA, glacirath: GLACIRATH, voltaris: VOLTARIS,
 });
 
-export const ALL_CREATURES  = { ...CREATURES, ...SHINY_CREATURES };
+export const ALL_CREATURES  = { ...CREATURES, ...SHINY_CREATURES, ...EXCLUSIVE_CREATURES };
 export const CREATURE_LIST  = Object.values(CREATURES);
 export const SHINY_LIST     = Object.values(SHINY_CREATURES);
 

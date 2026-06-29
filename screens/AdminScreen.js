@@ -9,7 +9,7 @@ import { db } from '../config/firebase';
 import { ref, get, set, remove, onValue, push } from 'firebase/database';
 import { useAuth } from '../store/AuthContext';
 import { useGameStore } from '../store/useGameStore';
-import { ALL_CREATURES, CREATURE_LIST } from '../data/creatures';
+import { ALL_CREATURES, CREATURE_LIST, EXCLUSIVE_CREATURES } from '../data/creatures';
 import { getLevelFromXp } from '../store/xpService';
 
 const { width: SW } = Dimensions.get('window');
@@ -60,6 +60,10 @@ export default function AdminScreen() {
   const [showGuildReset, setShowGuildReset] = useState(false);
   const [guildSearch, setGuildSearch] = useState('');
   const [codesList, setCodesList]     = useState([]);
+  const [releaseCreature, setReleaseCreature] = useState(Object.keys(EXCLUSIVE_CREATURES)[0]);
+  const [releaseMsg, setReleaseMsg]   = useState('');
+  const [releaseCrystals, setReleaseCrystals] = useState('0');
+  const [releasing, setReleasing]     = useState(false);
   const [newCode, setNewCode]         = useState('');
   const [newCodeCreature, setNewCodeCreature] = useState('lumikos');
   const [newCodeCrystals, setNewCodeCrystals] = useState('0');
@@ -273,6 +277,32 @@ export default function AdminScreen() {
     } catch(e) { showFeedback('Erreur', 'warning'); }
   }
 
+  // Sortir une créature exclusive pour tous les joueurs
+  async function handleReleaseCreature() {
+    if (releasing) return;
+    setReleasing(true);
+    const snap = await get(ref(db,'players')).catch(()=>null);
+    if (!snap||!snap.exists()) { showFeedback('Aucun joueur !','warning'); setReleasing(false); return; }
+    const playerUids = Object.keys(snap.val());
+    const creature = EXCLUSIVE_CREATURES[releaseCreature];
+    let sent = 0;
+    for (const puid of playerUids) {
+      await push(ref(db,`inbox/${puid}`), {
+        type:'system',
+        title:`🎁 Créature exclusive : ${creature.name} !`,
+        description:releaseMsg||`${creature.name} est maintenant disponible pour toi !`,
+        crystals:parseInt(releaseCrystals)||0,
+        creatureId:releaseCreature,
+        claimed:false,
+        createdAt:Date.now(),
+        expiresAt:Date.now()+30*86400000,
+      }).catch(()=>{});
+      sent++;
+    }
+    showFeedback(`✓ ${creature.name} envoyé à ${sent} joueurs !`);
+    setReleasing(false);
+  }
+
   // Créer un code
   async function handleCreateCode() {
     const code = newCode.trim().toUpperCase();
@@ -382,7 +412,7 @@ export default function AdminScreen() {
 
         {/* Tabs */}
         <View style={styles.tabRow}>
-          {['Stats','Joueurs','News','Analytics','Codes','Mon compte'].map(t=>(
+          {['Stats','Joueurs','News','Analytics','Codes','Release','Mon compte'].map(t=>(
             <TouchableOpacity key={t} onPress={()=>setTab(t)}
               style={[styles.tabBtn,tab===t&&styles.tabActive]}>
               <Text style={[styles.tabText,tab===t&&styles.tabTextActive]}>{t}</Text>
@@ -733,7 +763,71 @@ export default function AdminScreen() {
             </>
           )}
 
-          {/* ── ANALYTICS ── */}
+          {/* ── RELEASE ── */}
+          {tab==='Release'&&(
+            <>
+              <Text style={styles.sectionLabel}>🚀 SORTIR UNE CRÉATURE EXCLUSIVE</Text>
+              <View style={styles.appInfoCard}>
+                <Text style={{color:'#4a6080',fontSize:12,lineHeight:18}}>
+                  Envoie une créature exclusive dans la boîte de réception de TOUS les joueurs en un clic.
+                </Text>
+              </View>
+
+              <ActionCard title="Choisir la créature" emoji="✦">
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  <View style={{flexDirection:'row',gap:8,paddingBottom:8}}>
+                    {Object.values(EXCLUSIVE_CREATURES).map(c=>(
+                      <TouchableOpacity key={c.id} onPress={()=>setReleaseCreature(c.id)}
+                        style={[styles.creatureChip,{
+                          borderColor:releaseCreature===c.id?c.rarityColor:'#1e2d4a',
+                          backgroundColor:releaseCreature===c.id?c.rarityColor+'22':'#0d1220',
+                          padding:10,
+                        }]}>
+                        <Text style={[styles.creatureChipText,{color:c.rarityColor,fontSize:12}]}>{c.rarityLabel}</Text>
+                        <Text style={[styles.creatureChipText,{color:c.rarityColor,fontWeight:'900'}]}>{c.name}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </ScrollView>
+
+                {/* Preview */}
+                {EXCLUSIVE_CREATURES[releaseCreature]&&(()=>{
+                  const c=EXCLUSIVE_CREATURES[releaseCreature];
+                  return (
+                    <LinearGradient colors={c.bgGradient} style={{borderRadius:14,padding:14,borderWidth:1,borderColor:c.rarityColor+'44',gap:6}}>
+                      <Text style={{color:c.rarityColor,fontSize:16,fontWeight:'900'}}>{c.name}</Text>
+                      <Text style={{color:'#4a6080',fontSize:11}}>{c.description}</Text>
+                      <View style={{flexDirection:'row',gap:8}}>
+                        <Text style={{color:'#39ff8f',fontSize:11}}>❤️ {c.stats.hp}</Text>
+                        <Text style={{color:'#ff4fa3',fontSize:11}}>⚔️ {c.stats.atk}</Text>
+                        <Text style={{color:'#ffd700',fontSize:11}}>💨 {c.stats.spd}</Text>
+                      </View>
+                    </LinearGradient>
+                  );
+                })()}
+
+                {/* Message */}
+                <TextInput style={styles.input} value={releaseMsg} onChangeText={setReleaseMsg}
+                  placeholder="Message pour les joueurs (optionnel)..." placeholderTextColor="#4a6080"/>
+
+                {/* Cristaux bonus */}
+                <View style={{flexDirection:'row',gap:8,alignItems:'center'}}>
+                  <Text style={{color:'#4a6080',fontSize:12,width:100}}>💎 Cristaux bonus</Text>
+                  <TextInput style={[styles.input,{flex:1}]} value={releaseCrystals}
+                    onChangeText={setReleaseCrystals} keyboardType="numeric" placeholder="0" placeholderTextColor="#4a6080"/>
+                </View>
+
+                <TouchableOpacity onPress={handleReleaseCreature} disabled={releasing}
+                  style={[styles.mainBtn,{borderColor:'#39ff8f44',backgroundColor:'#39ff8f15'},releasing&&{opacity:0.5}]}>
+                  <Text style={[styles.mainBtnText,{color:'#39ff8f'}]}>
+                    {releasing?'Envoi en cours...':'🚀 Envoyer à tous les joueurs'}
+                  </Text>
+                </TouchableOpacity>
+              </ActionCard>
+            </>
+          )}
+
+          {/* ── ANALYTICS ── */}}}
           {tab==='Analytics'&&(
             <>
               <Text style={styles.sectionLabel}>📊 ANALYTICS JOUEURS</Text>
