@@ -7,7 +7,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Polygon, Circle, Ellipse, Path } from 'react-native-svg';
 import { db } from '../config/firebase';
-import { ref, set, get, onValue, push, remove } from 'firebase/database';
+import { ref, set, get, onValue, push, remove, serverTimestamp } from 'firebase/database';
 import { useGameStore } from '../store/useGameStore';
 import { useAuth } from '../store/AuthContext';
 import { SPRITES } from '../components/CreatureCard';
@@ -147,6 +147,12 @@ export default function ShopScreen() {
   const fadeAnim   = useRef(new Animated.Value(0)).current;
   const resultScale= useRef(new Animated.Value(0)).current;
 
+  // ── Codes ──
+  const [codeInput, setCodeInput]     = useState('');
+  const [codeLoading, setCodeLoading] = useState(false);
+  const [codeResult, setCodeResult]   = useState(null); // {success, message, creature}
+  const [redeemedCodes, setRedeemedCodes] = useState([]);
+
   // ── Marché ──
   const [marketTab, setMarketTab]       = useState('Parcourir');
   const [listings, setListings]         = useState([]);
@@ -173,6 +179,9 @@ export default function ShopScreen() {
     });
     get(ref(db, `boxes/${uid}/pity`)).then(s => { if (s.exists()) setPity(s.val()); });
     get(ref(db, `boxes/${uid}/count`)).then(s => { if (s.exists()) setOpenCount(s.val()); });
+    get(ref(db,`redeemedCodes/${uid}`)).then(s=>{
+      if (s.exists()) setRedeemedCodes(Object.keys(s.val()));
+    });
     const unsub = subscribeToListings(d => { setListings(d); setLoadingMarket(false); });
     return unsub;
   }, [uid]);
@@ -199,6 +208,58 @@ export default function ShopScreen() {
   }
 
   async function openStripe(key) { await Linking.openURL(STRIPE[key]); }
+
+  // ── Codes ──
+  async function redeemCode() {
+    const code = codeInput.trim().toUpperCase();
+    if (!code || codeLoading) return;
+    setCodeLoading(true); setCodeResult(null);
+
+    // Vérifier si déjà utilisé
+    if (redeemedCodes.includes(code)) {
+      setCodeResult({success:false, message:'Tu as déjà utilisé ce code !'});
+      setCodeLoading(false); return;
+    }
+
+    // Chercher le code dans Firebase
+    const snap = await get(ref(db,`codes/${code}`)).catch(()=>null);
+    if (!snap||!snap.exists()) {
+      setCodeResult({success:false, message:'Code invalide ou expiré.'});
+      setCodeLoading(false); return;
+    }
+
+    const data = snap.val();
+    // Vérifier expiration
+    if (data.expiresAt && Date.now() > data.expiresAt) {
+      setCodeResult({success:false, message:'Ce code a expiré !'});
+      setCodeLoading(false); return;
+    }
+    // Vérifier max utilisations
+    if (data.maxUses && (data.usedCount||0) >= data.maxUses) {
+      setCodeResult({success:false, message:"Ce code a atteint sa limite d'utilisation !"});
+      setCodeLoading(false); return;
+    }
+
+    // Donner la récompense
+    if (data.crystals) addCrystals(data.crystals);
+    if (data.creatureId && ALL_CREATURES[data.creatureId]) {
+      addToCollection({...ALL_CREATURES[data.creatureId], uid:`code_${code}_${Date.now()}`});
+    }
+
+    // Marquer comme utilisé
+    await set(ref(db,`redeemedCodes/${uid}/${code}`), Date.now()).catch(()=>{});
+    await set(ref(db,`codes/${code}/usedCount`), (data.usedCount||0)+1).catch(()=>{});
+    setRedeemedCodes(prev=>[...prev,code]);
+    setCodeResult({
+      success:true,
+      message:`Code "${code}" activé !`,
+      crystals:data.crystals||0,
+      creatureId:data.creatureId||null,
+      creature:data.creatureId?ALL_CREATURES[data.creatureId]:null,
+    });
+    setCodeInput('');
+    setCodeLoading(false);
+  }
 
   // ── Box open ──
   async function openBox() {
@@ -359,8 +420,9 @@ export default function ShopScreen() {
             {id:'Cristaux', emoji:'💎'},
             {id:'Boîtes',   emoji:'📦'},
             {id:'Marché',   emoji:'🏪'},
+            {id:'Codes',    emoji:'🔑'},
           ].map(t => (
-            <TouchableOpacity key={t.id} onPress={() => { setMainTab(t.id); if(t.id!=='Boîtes') resetBox(); }}
+            <TouchableOpacity key={t.id} onPress={() => { setMainTab(t.id); if(t.id!=='Boîtes') resetBox(); setCodeResult(null); }}
               style={[styles.mainTabBtn, mainTab===t.id && styles.mainTabActive]}>
               <Text style={styles.mainTabEmoji}>{t.emoji}</Text>
               <Text style={[styles.mainTabText, mainTab===t.id && styles.mainTabTextActive]}>{t.id}</Text>
@@ -680,6 +742,82 @@ export default function ShopScreen() {
           </>
         )}
 
+        {/* ══ CODES ══ */}
+        {mainTab==='Codes' && (
+          <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
+
+            {/* Header */}
+            <LinearGradient colors={['#0a0018','#07090f']} style={[styles.codeHeader,{borderColor:'#bf5fff33'}]}>
+              <Text style={styles.codeHeaderEmoji}>🔑</Text>
+              <Text style={styles.codeHeaderTitle}>CODES SECRETS</Text>
+              <Text style={styles.codeHeaderSub}>Entre un code pour débloquer des créatures exclusives ou des cristaux !</Text>
+            </LinearGradient>
+
+            {/* Input */}
+            <View style={styles.codeInputRow}>
+              <TextInput
+                style={styles.codeInput}
+                value={codeInput}
+                onChangeText={t=>setCodeInput(t.toUpperCase())}
+                placeholder="ENTRER UN CODE..."
+                placeholderTextColor="#4a6080"
+                autoCapitalize="characters"
+                maxLength={20}
+              />
+              <TouchableOpacity onPress={redeemCode} disabled={!codeInput.trim()||codeLoading}
+                style={[styles.codeBtn,(!codeInput.trim()||codeLoading)&&styles.disabled]}>
+                <LinearGradient colors={['#bf5fff55','#bf5fff22']} style={styles.codeBtnGrad}>
+                  <Text style={styles.codeBtnText}>{codeLoading?'...':'→'}</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            </View>
+
+            {/* Résultat */}
+            {codeResult&&(
+              <LinearGradient
+                colors={codeResult.success?['#0a1a0a','#07090f']:['#1a0000','#07090f']}
+                style={[styles.codeResult,{borderColor:codeResult.success?'#39ff8f44':'#ff444444'}]}>
+                <Text style={[styles.codeResultEmoji]}>{codeResult.success?'🎉':'❌'}</Text>
+                <Text style={[styles.codeResultMsg,{color:codeResult.success?'#39ff8f':'#ff4444'}]}>{codeResult.message}</Text>
+                {codeResult.success&&(
+                  <View style={styles.codeRewards}>
+                    {codeResult.crystals>0&&(
+                      <View style={[styles.rewardChipCode,{borderColor:'#ffd70044',backgroundColor:'#ffd70015'}]}>
+                        <Text style={styles.rewardChipCodeText}>+{codeResult.crystals} 💎</Text>
+                      </View>
+                    )}
+                    {codeResult.creature&&(
+                      <View style={[styles.rewardChipCode,{borderColor:codeResult.creature.rarityColor+'44',backgroundColor:codeResult.creature.rarityColor+'15'}]}>
+                        <Text style={[styles.rewardChipCodeText,{color:codeResult.creature.rarityColor}]}>✦ {codeResult.creature.name} obtenu !</Text>
+                      </View>
+                    )}
+                  </View>
+                )}
+              </LinearGradient>
+            )}
+
+            {/* Codes utilisés */}
+            {redeemedCodes.length>0&&(
+              <View style={styles.usedCodesBox}>
+                <Text style={styles.usedCodesTitle}>✓ CODES UTILISÉS ({redeemedCodes.length})</Text>
+                {redeemedCodes.map(c=>(
+                  <View key={c} style={styles.usedCodeRow}>
+                    <Text style={styles.usedCodeText}>🔑 {c}</Text>
+                    <View style={styles.usedCodeBadge}><Text style={styles.usedCodeBadgeText}>Utilisé</Text></View>
+                  </View>
+                ))}
+              </View>
+            )}
+
+            {/* Indice */}
+            <View style={styles.codeHintBox}>
+              <Text style={styles.codeHintEmoji}>💡</Text>
+              <Text style={styles.codeHintText}>Les codes sont cachés dans le jeu, sur les réseaux sociaux ou lors d'événements spéciaux !</Text>
+            </View>
+
+          </ScrollView>
+        )}
+
         {/* Modal achat skin */}
         <Modal visible={!!preview} transparent animationType="fade" onRequestClose={()=>setPreview(null)}>
           <View style={styles.modalOverlay}>
@@ -905,4 +1043,29 @@ const styles = StyleSheet.create({
   modalCancel:{padding:12},
   modalCancelText:{color:'#4a6080',fontSize:13},
   disabled:{opacity:0.4},
+  // Codes
+  codeHeader:{borderWidth:1,borderRadius:18,padding:20,alignItems:'center',gap:8,marginBottom:4},
+  codeHeaderEmoji:{fontSize:48},
+  codeHeaderTitle:{color:'#bf5fff',fontSize:18,fontWeight:'900',letterSpacing:4},
+  codeHeaderSub:{color:'#4a6080',fontSize:12,textAlign:'center',lineHeight:18},
+  codeInputRow:{flexDirection:'row',gap:10},
+  codeInput:{flex:1,backgroundColor:'#0d1220',borderWidth:1.5,borderColor:'#bf5fff44',borderRadius:14,padding:16,color:'#fff',fontSize:16,fontWeight:'700',letterSpacing:2},
+  codeBtn:{borderRadius:14,overflow:'hidden',borderWidth:1,borderColor:'#bf5fff44'},
+  codeBtnGrad:{paddingHorizontal:20,paddingVertical:16,alignItems:'center',justifyContent:'center'},
+  codeBtnText:{color:'#bf5fff',fontSize:20,fontWeight:'900'},
+  codeResult:{borderWidth:1.5,borderRadius:16,padding:16,alignItems:'center',gap:10},
+  codeResultEmoji:{fontSize:36},
+  codeResultMsg:{fontSize:14,fontWeight:'800',textAlign:'center'},
+  codeRewards:{flexDirection:'row',gap:8,flexWrap:'wrap',justifyContent:'center'},
+  rewardChipCode:{borderWidth:1,borderRadius:10,paddingHorizontal:12,paddingVertical:6},
+  rewardChipCodeText:{color:'#ffd700',fontSize:13,fontWeight:'900'},
+  usedCodesBox:{backgroundColor:'#0d1220',borderWidth:1,borderColor:'#1e2d4a',borderRadius:16,padding:14,gap:8},
+  usedCodesTitle:{fontSize:9,color:'#4a6080',letterSpacing:3,fontWeight:'700'},
+  usedCodeRow:{flexDirection:'row',alignItems:'center',justifyContent:'space-between',paddingVertical:4,borderBottomWidth:1,borderBottomColor:'#1e2d4a'},
+  usedCodeText:{color:'#c8daf0',fontSize:12,fontWeight:'700'},
+  usedCodeBadge:{backgroundColor:'#39ff8f18',borderWidth:1,borderColor:'#39ff8f33',borderRadius:6,paddingHorizontal:8,paddingVertical:2},
+  usedCodeBadgeText:{color:'#39ff8f',fontSize:9,fontWeight:'700'},
+  codeHintBox:{flexDirection:'row',gap:10,alignItems:'flex-start',backgroundColor:'#0d1220',borderWidth:1,borderColor:'#ffd70022',borderRadius:14,padding:12},
+  codeHintEmoji:{fontSize:18},
+  codeHintText:{flex:1,color:'#4a6080',fontSize:12,lineHeight:18},
 });

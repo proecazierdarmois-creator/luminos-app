@@ -59,6 +59,12 @@ export default function AdminScreen() {
   const [guilds, setGuilds] = useState([]);
   const [showGuildReset, setShowGuildReset] = useState(false);
   const [guildSearch, setGuildSearch] = useState('');
+  const [codesList, setCodesList]     = useState([]);
+  const [newCode, setNewCode]         = useState('');
+  const [newCodeCreature, setNewCodeCreature] = useState('lumikos');
+  const [newCodeCrystals, setNewCodeCrystals] = useState('0');
+  const [newCodeMaxUses, setNewCodeMaxUses]   = useState('100');
+  const [newCodeExpiry, setNewCodeExpiry]     = useState('');
   const [analyticsData, setAnalyticsData] = useState({
     newPlayersToday:0, newPlayersWeek:0,
     activeToday:[], activeWeek:[],
@@ -89,6 +95,16 @@ export default function AdminScreen() {
       } else setNewsList([]);
     });
     return unsubNews;
+  },[]);
+
+  useEffect(()=>{
+    const unsubCodes = onValue(ref(db,'codes'),snap=>{
+      if (snap.exists()) {
+        const list = Object.entries(snap.val()).map(([code,v])=>({code,...v}));
+        setCodesList(list);
+      } else setCodesList([]);
+    });
+    return unsubCodes;
   },[]);
 
   useEffect(()=>{
@@ -257,6 +273,30 @@ export default function AdminScreen() {
     } catch(e) { showFeedback('Erreur', 'warning'); }
   }
 
+  // Créer un code
+  async function handleCreateCode() {
+    const code = newCode.trim().toUpperCase();
+    if (!code) { showFeedback('Entre un code !','warning'); return; }
+    const snap = await get(ref(db,`codes/${code}`));
+    if (snap.exists()) { showFeedback('Ce code existe déjà !','warning'); return; }
+    const data = {
+      creatureId: newCodeCreature!=='none'?newCodeCreature:null,
+      crystals: parseInt(newCodeCrystals)||0,
+      maxUses: parseInt(newCodeMaxUses)||100,
+      usedCount: 0,
+      createdAt: Date.now(),
+      expiresAt: newCodeExpiry ? new Date(newCodeExpiry).getTime() : null,
+    };
+    await set(ref(db,`codes/${code}`),data).catch(()=>{});
+    setNewCode(''); setNewCodeCrystals('0'); setNewCodeExpiry('');
+    showFeedback(`✓ Code "${code}" créé !`);
+  }
+
+  async function handleDeleteCode(code) {
+    await remove(ref(db,`codes/${code}`)).catch(()=>{});
+    showFeedback(`✓ Code "${code}" supprimé`,'warning');
+  }
+
   // Publier une news
   async function handlePublishNews() {
     if (!newsTitle.trim()||!newsContent.trim()) { showFeedback('Titre et contenu requis !','warning'); return; }
@@ -342,7 +382,7 @@ export default function AdminScreen() {
 
         {/* Tabs */}
         <View style={styles.tabRow}>
-          {['Stats','Joueurs','News','Analytics','Mon compte'].map(t=>(
+          {['Stats','Joueurs','News','Analytics','Codes','Mon compte'].map(t=>(
             <TouchableOpacity key={t} onPress={()=>setTab(t)}
               style={[styles.tabBtn,tab===t&&styles.tabActive]}>
               <Text style={[styles.tabText,tab===t&&styles.tabTextActive]}>{t}</Text>
@@ -619,6 +659,75 @@ export default function AdminScreen() {
                     style={styles.newsDeleteBtn}>
                     <Text style={styles.newsDeleteText}>✕</Text>
                   </TouchableOpacity>
+                </View>
+              ))}
+            </>
+          )}
+
+          {/* ── CODES ── */}
+          {tab==='Codes'&&(
+            <>
+              <Text style={styles.sectionLabel}>🔑 CRÉER UN CODE SECRET</Text>
+              <ActionCard title="Nouveau code" emoji="🔑">
+                {/* Code */}
+                <TextInput style={[styles.input,{letterSpacing:3,textTransform:'uppercase',fontWeight:'800'}]}
+                  value={newCode} onChangeText={t=>setNewCode(t.toUpperCase())}
+                  placeholder="Ex: LUMINOS2026" placeholderTextColor="#4a6080" maxLength={20}
+                  autoCapitalize="characters"/>
+                {/* Cristaux */}
+                <View style={{flexDirection:'row',gap:8,alignItems:'center'}}>
+                  <Text style={{color:'#4a6080',fontSize:12,width:80}}>💎 Cristaux</Text>
+                  <TextInput style={[styles.input,{flex:1}]} value={newCodeCrystals}
+                    onChangeText={setNewCodeCrystals} keyboardType="numeric" placeholder="0" placeholderTextColor="#4a6080"/>
+                </View>
+                {/* Max utilisations */}
+                <View style={{flexDirection:'row',gap:8,alignItems:'center'}}>
+                  <Text style={{color:'#4a6080',fontSize:12,width:80}}>👥 Max uses</Text>
+                  <TextInput style={[styles.input,{flex:1}]} value={newCodeMaxUses}
+                    onChangeText={setNewCodeMaxUses} keyboardType="numeric" placeholder="100" placeholderTextColor="#4a6080"/>
+                </View>
+                {/* Créature */}
+                <Text style={{color:'#4a6080',fontSize:12}}>✦ Créature exclusive :</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  <View style={{flexDirection:'row',gap:6,paddingBottom:4}}>
+                    <TouchableOpacity onPress={()=>setNewCodeCreature('none')}
+                      style={[styles.creatureChip,{borderColor:newCodeCreature==='none'?'#ff444444':'#1e2d4a',backgroundColor:newCodeCreature==='none'?'#ff444415':'#0d1220'}]}>
+                      <Text style={[styles.creatureChipText,{color:'#4a6080'}]}>Aucune</Text>
+                    </TouchableOpacity>
+                    {CREATURE_LIST.map(c=>(
+                      <TouchableOpacity key={c.id} onPress={()=>setNewCodeCreature(c.id)}
+                        style={[styles.creatureChip,{borderColor:newCodeCreature===c.id?c.rarityColor:'#1e2d4a',backgroundColor:newCodeCreature===c.id?c.rarityColor+'22':'#0d1220'}]}>
+                        <Text style={[styles.creatureChipText,{color:c.rarityColor}]}>{c.name}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </ScrollView>
+                <TouchableOpacity onPress={handleCreateCode}
+                  style={[styles.mainBtn,{borderColor:'#bf5fff44',backgroundColor:'#bf5fff15'}]}>
+                  <Text style={[styles.mainBtnText,{color:'#bf5fff'}]}>🔑 Créer le code</Text>
+                </TouchableOpacity>
+              </ActionCard>
+
+              {/* Liste codes */}
+              <Text style={styles.sectionLabel}>CODES ACTIFS ({codesList.length})</Text>
+              {codesList.length===0&&<Text style={styles.emptyText}>Aucun code créé</Text>}
+              {codesList.map(c=>(
+                <View key={c.code} style={[styles.topRow,{borderColor:'#bf5fff22',flexDirection:'column',gap:6,alignItems:'flex-start'}]}>
+                  <View style={{flexDirection:'row',alignItems:'center',gap:8,width:'100%'}}>
+                    <Text style={{color:'#bf5fff',fontSize:16,fontWeight:'900',letterSpacing:2,flex:1}}>🔑 {c.code}</Text>
+                    <TouchableOpacity onPress={()=>handleDeleteCode(c.code)}
+                      style={[styles.removeBtn]}>
+                      <Text style={styles.removeBtnText}>−</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View style={{flexDirection:'row',gap:8,flexWrap:'wrap'}}>
+                    {c.crystals>0&&<Text style={{color:'#ffd700',fontSize:11}}>💎 {c.crystals} cristaux</Text>}
+                    {c.creatureId&&<Text style={{color:'#00e5ff',fontSize:11}}>✦ {ALL_CREATURES[c.creatureId]?.name||c.creatureId}</Text>}
+                    <Text style={{color:'#4a6080',fontSize:11}}>👥 {c.usedCount||0}/{c.maxUses||'∞'} uses</Text>
+                    {c.expiresAt&&<Text style={{color:Date.now()>c.expiresAt?'#ff4444':'#39ff8f',fontSize:11}}>
+                      📅 {Date.now()>c.expiresAt?'Expiré':'Expire le '+new Date(c.expiresAt).toLocaleDateString('fr-FR')}
+                    </Text>}
+                  </View>
                 </View>
               ))}
             </>
