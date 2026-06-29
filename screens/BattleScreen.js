@@ -18,13 +18,28 @@ function cloneCreature(c) {
 }
 function randomEnemy(excludedId) {
   const pool = CREATURE_LIST.filter(c => c && c.id !== excludedId);
-  return cloneCreature(pool[Math.floor(Math.random() * pool.length)] || CREATURE_LIST[0]);
+  const base = pool[Math.floor(Math.random() * pool.length)] || CREATURE_LIST[0];
+  // Boost les stats ennemies selon la rareté
+  const boost = base.rarity==='legendary'?1.3:base.rarity==='rare'?1.2:base.rarity==='uncommon'?1.1:1.05;
+  const boosted = {
+    ...base,
+    stats: {
+      ...base.stats,
+      hp:    Math.round(base.stats.hp    * boost),
+      maxHp: Math.round((base.stats.maxHp||base.stats.hp) * boost),
+      atk:   Math.round(base.stats.atk   * boost),
+      spd:   Math.round(base.stats.spd   * boost),
+    }
+  };
+  return cloneCreature(boosted);
 }
-function calcDamage(attacker, move) {
+function calcDamage(attacker, move, isEnemy=false) {
   const base = move.power, mod = attacker.stats.atk / 100;
-  const variance = 0.85 + Math.random() * 0.3;
-  const isCrit = Math.random() < 0.15;
-  const dmg = Math.max(1, Math.round(base * (1 + mod) * variance * (isCrit ? 1.5 : 1)));
+  const variance = isEnemy ? 0.9 + Math.random() * 0.5 : 0.85 + Math.random() * 0.3;
+  const critChance = isEnemy ? 0.22 : 0.12;
+  const isCrit = Math.random() < critChance;
+  const enemyBoost = isEnemy ? 1.25 : 1.0;
+  const dmg = Math.max(1, Math.round(base * (1 + mod) * variance * (isCrit ? 1.6 : 1) * enemyBoost));
   return { dmg, isCrit };
 }
 function getSpriteId(id) {
@@ -257,7 +272,9 @@ export default function BattleScreen() {
       setTimeout(()=>{
         addLog(`🏆 Victoire ! ${enemy.name} est vaincu !`);
         setWon(true); recordBattle(true); setPhase('end');
-        addCrystals(2);
+        // Récompense selon la rareté de l'ennemi
+        const winReward = enemy.rarity==='legendary'?6:enemy.rarity==='rare'?4:enemy.rarity==='uncommon'?3:2;
+        addCrystals(winReward);
         const uid=auth.currentUser?.uid; if(uid) addXp(uid,XP_REWARDS.win,null,null,null);
         Animated.timing(victoryAnim,{toValue:1,duration:500,useNativeDriver:true}).start();
         spawnParticles(SW/2,160,'#ffd700',22);
@@ -267,8 +284,10 @@ export default function BattleScreen() {
     }
     setTurn('enemy'); doTurnFlash();
     setTimeout(()=>{
-      const em=enemy.moves[Math.floor(Math.random()*enemy.moves.length)];
-      const {dmg:eDmg,isCrit:eCrit}=calcDamage(enemy,em);
+      // L'ennemi choisit intelligemment — 60% meilleure attaque, 40% aléatoire
+      const sortedMoves = [...enemy.moves].sort((a,b)=>b.power-a.power);
+      const em = Math.random()<0.6 ? sortedMoves[0] : enemy.moves[Math.floor(Math.random()*enemy.moves.length)];
+      const {dmg:eDmg,isCrit:eCrit}=calcDamage(enemy,em,true);
       const newPHp=Math.max(0,player.stats.hp-eDmg);
       doAttack(attackE,-1);
       setTimeout(()=>{
@@ -504,7 +523,9 @@ export default function BattleScreen() {
               {won&&(
                 <View style={styles.endRewards}>
                   <View style={styles.endRewardChip}>
-                    <Text style={styles.endRewardText}>+2 💎</Text>
+                    <Text style={styles.endRewardText}>
+                      +{enemy?.rarity==='legendary'?6:enemy?.rarity==='rare'?4:enemy?.rarity==='uncommon'?3:2} 💎
+                    </Text>
                   </View>
                   <View style={[styles.endRewardChip,{backgroundColor:'#00e5ff18',borderColor:'#00e5ff33'}]}>
                     <Text style={[styles.endRewardText,{color:'#00e5ff'}]}>+{XP_REWARDS.win} XP</Text>
