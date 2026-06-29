@@ -170,6 +170,410 @@ function LuminosSprite({ size = 90 }) {
   );
 }
 
+
+// ─── Sprites Exclusifs ────────────────────────────────────────────
+
+export function AstralisSprite({ size = 90 }) {
+  const S = require('react-native-svg');
+  const Svg = S.default, { Ellipse, Path, Polygon, Circle } = S;
+  return (
+    <Svg width={size} height={size} viewBox="0 0 110 110">
+      {/* Nébuleuse fond */}
+      <Circle cx="58" cy="55" r="50" fill="#aaeeff" opacity="0.06"/>
+      <Circle cx="58" cy="55" r="38" fill="#80d4ff" opacity="0.05"/>
+      {/* Étoiles orbitales */}
+      {[0,40,80,120,160,200,240,280,320].map((deg,i)=>{
+        const r=deg*Math.PI/180, x=58+42*Math.cos(r), y=55+42*Math.sin(r);
+        return <Circle key={i} cx={x} cy={y} r={i%3===0?2.5:1.5} fill={i%2===0?"#aaeeff":"#ffffff"} opacity={0.5+i*0.05}/>;
+      })}
+      {/* Anneaux cosmiques */}
+      <Ellipse cx="58" cy="30" rx="34" ry="10" fill="none" stroke="#80d4ff" strokeWidth="1.5" opacity="0.5"/>
+      <Ellipse cx="58" cy="28" rx="26" ry="7" fill="none" stroke="#aaeeff" strokeWidth="1" opacity="0.4"/>
+      {/* Ailes cosmiques translucides */}
+      <Path d="M28 52 Q4 28 8 6 Q24 22 32 50Z" fill="#204060" opacity="0.7"/>
+      <Path d="M30 50 Q10 28 16 8 Q26 24 34 48Z" fill="#aaeeff" opacity="0.2"/>
+      <Path d="M88 52 Q112 28 108 6 Q92 22 84 50Z" fill="#204060" opacity="0.7"/>
+      <Path d="M86 50 Q106 28 100 8 Q90 24 82 48Z" fill="#aaeeff" opacity="0.2"/>
+      {/* Étoiles sur ailes */}
+      <Circle cx="20" cy="30" r="2" fill="#aaeeff" opacity="0.7"/>
+      <Circle cx="96" cy="28" r="2" fill="#aaeeff" opacity="0.7"/>
+      <Circle cx="15" cy="45" r="1.5" fill="#ffffff" opacity="0.6"/>
+      <Circle cx="100" cy="42" r="1.5" fill="#ffffff" opacity="0.6"/>
+      {/* Queue nébuleuse */}
+      <Path d="M18 80 Q6 64 10 48 Q16 62 14 78Z" fill="#102030" opacity="0.9"/>
+      <Polygon points="6,50 2,42 10,46" fill="#aaeeff" opacity="0.8"/>
+      {/* Corps */}
+      <Ellipse cx="58" cy="73" rx="32" ry="26" fill="#102840"/>
+      <Ellipse cx="58" cy="77" rx="20" ry="16" fill="#ddf8ff"/>
+      {/* Constellation sur corps */}
+      <Circle cx="44" cy="70" r="1.5" fill="#aaeeff" opacity="0.8"/>
+      <Circle cx="52" cy="65" r="1" fill="#ffffff" opacity="0.7"/>
+      <Circle cx="66" cy="68" r="1.5" fill="#aaeeff" opacity="0.8"/>
+      <Circle cx="72" cy="74" r="1" fill="#ffffff" opacity="0.6"/>
+      <Path d="M44 70 L52 65 L66 68 L72 74" stroke="#aaeeff" strokeWidth="0.5" opacity="0.4"/>
+      {/* Couronne étoilée */}
+      <Polygon points="44,32 48,16 52,28 58,14 64,28 68,16 72,32" fill="#204060"/>
+      <Polygon points="44,32 48,18 52,28 58,16 64,28 68,18 72,32" fill="#aaeeff" opacity="0.5"/>
+      <Circle cx="48" cy="20" r="3" fill="#80d4ff"/>
+      <Circle cx="58" cy="15" r="4" fill="white" opacity="0.9"/>
+      <Circle cx="68" cy="20" r="3" fill="#80d4ff"/>
+      {/* Oreilles pointues cosmiques */}
+      <Polygon points="38,40 34,18 46,38" fill="#102840"/>
+      <Polygon points="40,38 36,20 45,37" fill="#aaeeff" opacity="0.4"/>
+      <Polygon points="78,40 82,18 70,38" fill="#102840"/>
+      <Polygon points="76,38 80,20 71,37" fill="#aaeeff" opacity="0.4"/>
+      {/* Tête */}
+      <Ellipse cx="58" cy="52" rx="27" ry="24" fill="#142a3a"/>
+      <Ellipse cx="49" cy="44" rx="12" ry="9" fill="#60a8d0" opacity="0.3"/>
+      {/* Prisme frontal nébuleuse */}
+      <Polygon points="58,32 66,44 58,50 50,44" fill="#aaeeff"/>
+      <Polygon points="58,34 64,44 58,49 52,44" fill="white" opacity="0.6"/>
+      <Circle cx="58" cy="41" r="5" fill="#aaeeff" opacity="0.4"/>
+      {/* Joues */}
+      <Ellipse cx="38" cy="57" rx="8" ry="5" fill="#80d4ff" opacity="0.4"/>
+      <Ellipse cx="78" cy="57" rx="8" ry="5" fill="#80d4ff" opacity="0.4"/>
+      <Circle cx="36" cy="56" r="1.5" fill="white" opacity="0.6"/>
+      <Circle cx="80" cy="56" r="1.5" fill="white" opacity="0.6"/>
+      {/* Yeux cosmos */}
+      <Ellipse cx="47" cy="51" rx="8.5" ry="9" fill="#040818"/>
+      <Ellipse cx="47" cy="51" rx="6" ry="6.5" fill="#204870"/>
+      <Ellipse cx="47" cy="51" rx="3" ry="3.5" fill="#020408"/>
+      <Ellipse cx="45" cy="49" rx="2" ry="2.2" fill="white" opacity="0.95"/>
+      <Circle cx="49" cy="53" r="1" fill="#aaeeff" opacity="0.8"/>
+      <Ellipse cx="69" cy="51" rx="8.5" ry="9" fill="#040818"/>
+      <Ellipse cx="69" cy="51" rx="6" ry="6.5" fill="#204870"/>
+      <Ellipse cx="69" cy="51" rx="3" ry="3.5" fill="#020408"/>
+      <Ellipse cx="67" cy="49" rx="2" ry="2.2" fill="white" opacity="0.95"/>
+      <Ellipse cx="58" cy="62" rx="3" ry="2" fill="#204060"/>
+      <Path d="M50 66 Q58 73 66 66" stroke="#204060" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+      {/* Pieds */}
+      <Ellipse cx="44" cy="95" rx="11" ry="6" fill="#102840"/>
+      <Ellipse cx="72" cy="95" rx="11" ry="6" fill="#102840"/>
+    </Svg>
+  );
+}
+
+export function PhanterosSprite({ size = 90 }) {
+  const S = require('react-native-svg');
+  const Svg = S.default, { Ellipse, Path, Polygon, Circle } = S;
+  return (
+    <Svg width={size} height={size} viewBox="0 0 110 110">
+      {/* Lune Halloween */}
+      <Circle cx="90" cy="18" r="12" fill="#ff6b00" opacity="0.2"/>
+      <Circle cx="90" cy="18" r="8" fill="#ff8800" opacity="0.3"/>
+      {/* Aura orange-noire */}
+      <Circle cx="58" cy="60" r="48" fill="#ff4400" opacity="0.06"/>
+      {/* Grandes ailes de chauve-souris */}
+      <Path d="M28 52 Q4 30 8 8 Q24 22 32 50Z" fill="#1a0800" opacity="0.95"/>
+      <Path d="M26 52 Q6 34 12 12 Q24 26 30 50Z" fill="#ff4400" opacity="0.15"/>
+      <Path d="M20 62 Q2 50 6 36 Q14 44 22 60Z" fill="#1a0800" opacity="0.8"/>
+      <Path d="M88 52 Q112 30 108 8 Q92 22 84 50Z" fill="#1a0800" opacity="0.95"/>
+      <Path d="M90 52 Q110 34 104 12 Q92 26 86 50Z" fill="#ff4400" opacity="0.15"/>
+      <Path d="M96 62 Q114 50 110 36 Q102 44 94 60Z" fill="#1a0800" opacity="0.8"/>
+      {/* Nervures ailes */}
+      <Path d="M28 52 Q18 38 22 18 Q26 32 30 50" stroke="#ff4400" strokeWidth="1" fill="none" opacity="0.5"/>
+      <Path d="M20 62 Q10 52 14 40 Q16 50 22 60" stroke="#ff4400" strokeWidth="1" fill="none" opacity="0.4"/>
+      {/* Queue fantôme */}
+      <Path d="M22 82 Q10 68 14 52 Q20 64 18 80Z" fill="#1a0800" opacity="0.9"/>
+      {/* Corps sombre */}
+      <Ellipse cx="58" cy="73" rx="33" ry="26" fill="#1a0800"/>
+      <Ellipse cx="58" cy="77" rx="21" ry="16" fill="#3a1000"/>
+      {/* Rayures citrouille */}
+      <Path d="M40 70 Q50 64 60 70 Q70 64 80 70" stroke="#ff4400" strokeWidth="2" fill="none" opacity="0.5"/>
+      {/* Oreilles pointues chauve-souris */}
+      <Polygon points="38,42 30,16 46,40" fill="#1a0800"/>
+      <Polygon points="40,40 34,18 44,39" fill="#ff4400" opacity="0.3"/>
+      <Polygon points="78,42 86,16 70,40" fill="#1a0800"/>
+      <Polygon points="76,40 82,18 72,39" fill="#ff4400" opacity="0.3"/>
+      {/* Tête */}
+      <Ellipse cx="58" cy="52" rx="27" ry="24" fill="#220a00"/>
+      <Ellipse cx="49" cy="43" rx="11" ry="8" fill="#ff4400" opacity="0.15"/>
+      {/* Citrouille sur front */}
+      <Circle cx="58" cy="38" r="9" fill="#ff6b00"/>
+      <Polygon points="52,32 55,28 58,32 61,28 64,32 61,36 55,36" fill="#1a0800" opacity="0.7"/>
+      <Circle cx="55" cy="36" r="2" fill="#1a0800"/>
+      <Circle cx="61" cy="36" r="2" fill="#1a0800"/>
+      <Path d="M54 40 Q58 43 62 40" stroke="#1a0800" strokeWidth="1.5" fill="none"/>
+      {/* Joues */}
+      <Ellipse cx="38" cy="57" rx="7" ry="5" fill="#ff4400" opacity="0.3"/>
+      <Ellipse cx="78" cy="57" rx="7" ry="5" fill="#ff4400" opacity="0.3"/>
+      {/* Yeux malveillants */}
+      <Polygon points="40,48 48,44 48,54 40,54" fill="#ff6b00"/>
+      <Polygon points="42,48 47,45 47,53 42,53" fill="#1a0800"/>
+      <Polygon points="68,48 76,44 76,54 68,54" fill="#ff6b00"/>
+      <Polygon points="68,48 74,45 74,53 68,53" fill="#1a0800"/>
+      <Circle cx="44" cy="49" r="1.5" fill="#ffaa00" opacity="0.9"/>
+      <Circle cx="72" cy="49" r="1.5" fill="#ffaa00" opacity="0.9"/>
+      {/* Sourire effrayant */}
+      <Path d="M46 64 Q50 70 58 66 Q66 70 70 64" stroke="#ff4400" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+      <Circle cx="50" cy="66" r="1.5" fill="#ff6b00" opacity="0.8"/>
+      <Circle cx="66" cy="66" r="1.5" fill="#ff6b00" opacity="0.8"/>
+      <Circle cx="58" cy="68" r="1.5" fill="#ff6b00" opacity="0.6"/>
+      {/* Pieds */}
+      <Ellipse cx="44" cy="95" rx="11" ry="6" fill="#1a0800"/>
+      <Ellipse cx="72" cy="95" rx="11" ry="6" fill="#1a0800"/>
+    </Svg>
+  );
+}
+
+export function DrakovyrSprite({ size = 90 }) {
+  const S = require('react-native-svg');
+  const Svg = S.default, { Ellipse, Path, Polygon, Circle } = S;
+  return (
+    <Svg width={size} height={size} viewBox="0 0 110 110">
+      {/* Aura légendaire rouge sang */}
+      <Circle cx="58" cy="55" r="50" fill="#aa0000" opacity="0.1"/>
+      <Circle cx="58" cy="55" r="40" fill="#ff2200" opacity="0.06"/>
+      {/* Rayons de feu primordial */}
+      {[0,30,60,90,120,150,180,210,240,270,300,330].map((deg,i)=>(
+        <Path key={i}
+          d={`M58 55 L${58+Math.cos(deg*Math.PI/180)*28} ${55+Math.sin(deg*Math.PI/180)*28}`}
+          stroke="#ff2200" strokeWidth="1" opacity="0.25"
+        />
+      ))}
+      {/* Immenses ailes draconiques */}
+      <Path d="M22 55 Q-2 25 4 2 Q20 18 28 52Z" fill="#660000" opacity="0.95"/>
+      <Path d="M24 53 Q4 26 10 4 Q22 20 30 50Z" fill="#ff3300" opacity="0.3"/>
+      <Path d="M18 68 Q0 55 4 38 Q12 48 20 65Z" fill="#550000" opacity="0.9"/>
+      <Path d="M94 55 Q118 25 112 2 Q96 18 88 52Z" fill="#660000" opacity="0.95"/>
+      <Path d="M92 53 Q112 26 106 4 Q94 20 86 50Z" fill="#ff3300" opacity="0.3"/>
+      <Path d="M98 68 Q116 55 112 38 Q104 48 96 65Z" fill="#550000" opacity="0.9"/>
+      {/* Nervures ailes */}
+      {[0.2,0.4,0.6,0.8].map((t,i)=>(
+        <Path key={i} d={`M${22+t*10} ${55-t*20} Q${12-t*8} ${42-t*14} ${16-t*8} ${24-t*18}`}
+          stroke="#ff4400" strokeWidth="1.2" fill="none" opacity="0.5"/>
+      ))}
+      {/* Queue massive avec épines */}
+      <Path d="M15 80 Q2 62 6 44 Q14 58 12 78Z" fill="#550000" opacity="0.95"/>
+      <Polygon points="2,46 -4,38 6,44" fill="#cc0000"/>
+      <Polygon points="8,62 2,54 10,58" fill="#cc0000"/>
+      <Polygon points="14,72 8,64 16,68" fill="#aa0000"/>
+      {/* Corps colossal */}
+      <Ellipse cx="58" cy="73" rx="36" ry="28" fill="#440000"/>
+      <Ellipse cx="58" cy="77" rx="23" ry="18" fill="#882222"/>
+      {/* Écailles sur corps */}
+      <Ellipse cx="42" cy="68" rx="9" ry="6" fill="#330000" opacity="0.6" transform="rotate(-15 42 68)"/>
+      <Ellipse cx="62" cy="64" rx="9" ry="6" fill="#330000" opacity="0.5" transform="rotate(10 62 64)"/>
+      <Ellipse cx="76" cy="72" rx="8" ry="5" fill="#330000" opacity="0.5" transform="rotate(-10 76 72)"/>
+      {/* Crête dorsale imposante */}
+      <Polygon points="42,28 46,8 50,28" fill="#cc0000"/>
+      <Polygon points="49,24 53,4 57,24" fill="#ff2200"/>
+      <Polygon points="56,22 60,2 64,22" fill="#ff2200"/>
+      <Polygon points="63,24 67,6 71,24" fill="#cc0000"/>
+      <Polygon points="70,28 74,10 78,28" fill="#aa0000"/>
+      {/* Couronne flammes */}
+      <Path d="M42,28 Q46,16 50,24 Q52,10 56,20 Q58,6 62,18 Q64,8 68,20 Q70,14 74,26 Q68,18 62,24 Q58,10 54,22 Q50,14 46,24 Q44,18 42,28Z" fill="#ff4400" opacity="0.8"/>
+      {/* Cornes tordues */}
+      <Polygon points="36,36 28,10 42,34" fill="#330000"/>
+      <Path d="M36 34 Q32 22 30 12" stroke="#ff2200" strokeWidth="2" fill="none" opacity="0.6"/>
+      <Polygon points="80,36 88,10 74,34" fill="#330000"/>
+      <Path d="M80 34 Q84 22 86 12" stroke="#ff2200" strokeWidth="2" fill="none" opacity="0.6"/>
+      {/* Tête draconique */}
+      <Ellipse cx="58" cy="51" rx="28" ry="25" fill="#550000"/>
+      <Ellipse cx="47" cy="42" rx="12" ry="9" fill="#882222" opacity="0.4"/>
+      {/* Gemme sang */}
+      <Polygon points="58,28 68,42 58,50 48,42" fill="#cc0000"/>
+      <Polygon points="58,30 66,42 58,49 50,42" fill="#ff4444" opacity="0.5"/>
+      <Circle cx="58" cy="40" r="5" fill="#ff0000" opacity="0.4"/>
+      {/* Narines fumantes */}
+      <Circle cx="50" cy="62" r="3" fill="#220000"/>
+      <Circle cx="66" cy="62" r="3" fill="#220000"/>
+      <Ellipse cx="50" cy="59" rx="3" ry="5" fill="#ff2200" opacity="0.6"/>
+      <Ellipse cx="66" cy="59" rx="3" ry="5" fill="#ff2200" opacity="0.6"/>
+      {/* Joues */}
+      <Ellipse cx="37" cy="57" rx="8" ry="6" fill="#880000" opacity="0.4"/>
+      <Ellipse cx="79" cy="57" rx="8" ry="6" fill="#880000" opacity="0.4"/>
+      {/* Yeux anciens */}
+      <Ellipse cx="46" cy="50" rx="9" ry="9.5" fill="#0a0000"/>
+      <Ellipse cx="46" cy="50" rx="6.5" ry="7" fill="#880000"/>
+      <Ellipse cx="46" cy="50" rx="3" ry="3.5" fill="#040000"/>
+      <Ellipse cx="44" cy="48" rx="2.2" ry="2.5" fill="#ff4444" opacity="0.8"/>
+      <Ellipse cx="70" cy="50" rx="9" ry="9.5" fill="#0a0000"/>
+      <Ellipse cx="70" cy="50" rx="6.5" ry="7" fill="#880000"/>
+      <Ellipse cx="70" cy="50" rx="3" ry="3.5" fill="#040000"/>
+      <Ellipse cx="68" cy="48" rx="2.2" ry="2.5" fill="#ff4444" opacity="0.8"/>
+      {/* Gueule */}
+      <Path d="M46 65 Q58 74 70 65" stroke="#440000" strokeWidth="3" fill="none" strokeLinecap="round"/>
+      <Ellipse cx="58" cy="63" rx="7" ry="4" fill="#ff2200" opacity="0.3"/>
+      {/* Pieds */}
+      <Ellipse cx="42" cy="97" rx="12" ry="7" fill="#440000"/>
+      <Ellipse cx="74" cy="97" rx="12" ry="7" fill="#440000"/>
+    </Svg>
+  );
+}
+
+export function FrostaelSprite({ size = 90 }) {
+  const S = require('react-native-svg');
+  const Svg = S.default, { Ellipse, Path, Polygon, Circle } = S;
+  return (
+    <Svg width={size} height={size} viewBox="0 0 110 110">
+      {/* Flocons de neige */}
+      {[0,60,120,180,240,300].map((deg,i)=>{
+        const r=deg*Math.PI/180, x=58+46*Math.cos(r), y=55+46*Math.sin(r);
+        return <Circle key={i} cx={x} cy={y} r={2} fill="white" opacity={0.5}/>;
+      })}
+      {/* Aura hivernale */}
+      <Circle cx="58" cy="55" r="48" fill="#aaddff" opacity="0.07"/>
+      {/* Cristaux de neige géants */}
+      <Path d="M58 10 L58 22 M52 12 L64 20 M52 20 L64 12" stroke="#aaddff" strokeWidth="2" opacity="0.6"/>
+      <Path d="M58 94 L58 106 M52 96 L64 104 M52 104 L64 96" stroke="#aaddff" strokeWidth="2" opacity="0.4"/>
+      {/* Grandes ailes enneigées */}
+      <Path d="M28 52 Q6 30 10 8 Q26 24 32 50Z" fill="#2255aa" opacity="0.8"/>
+      <Path d="M30 50 Q12 30 18 10 Q28 26 34 48Z" fill="#aaddff" opacity="0.3"/>
+      <Path d="M88 52 Q110 30 106 8 Q90 24 84 50Z" fill="#2255aa" opacity="0.8"/>
+      <Path d="M86 50 Q104 30 98 10 Q88 26 82 48Z" fill="#aaddff" opacity="0.3"/>
+      {/* Flocons sur ailes */}
+      <Circle cx="18" cy="28" r="3" fill="white" opacity="0.5"/>
+      <Circle cx="98" cy="26" r="3" fill="white" opacity="0.5"/>
+      <Circle cx="14" cy="44" r="2" fill="#aaddff" opacity="0.6"/>
+      <Circle cx="102" cy="42" r="2" fill="#aaddff" opacity="0.6"/>
+      {/* Queue cristal givre */}
+      <Path d="M18 80 Q6 64 10 48 Q16 62 14 78Z" fill="#1144aa" opacity="0.9"/>
+      <Polygon points="6,50 2,42 10,46" fill="white" opacity="0.8"/>
+      {/* Corps */}
+      <Ellipse cx="58" cy="73" rx="33" ry="26" fill="#1144aa"/>
+      <Ellipse cx="58" cy="77" rx="21" ry="16" fill="#eef8ff"/>
+      {/* Armure givre */}
+      <Ellipse cx="44" cy="68" rx="10" ry="6" fill="#aaddff" opacity="0.3" transform="rotate(-15 44 68)"/>
+      <Ellipse cx="72" cy="66" rx="9" ry="6" fill="#aaddff" opacity="0.3" transform="rotate(15 72 66)"/>
+      {/* Flocons sur corps */}
+      <Circle cx="52" cy="70" r="1.5" fill="white" opacity="0.6"/>
+      <Circle cx="64" cy="74" r="1.5" fill="white" opacity="0.5"/>
+      <Circle cx="70" cy="68" r="1" fill="#aaddff" opacity="0.7"/>
+      {/* Couronne flocon */}
+      <Path d="M58 18 L58 30 M50 20 L66 28 M50 28 L66 20" stroke="#aaddff" strokeWidth="2.5" opacity="0.9"/>
+      <Circle cx="58" cy="18" r="4" fill="#aaddff"/>
+      <Circle cx="50" cy="20" r="3" fill="white" opacity="0.8"/>
+      <Circle cx="66" cy="20" r="3" fill="white" opacity="0.8"/>
+      <Circle cx="50" cy="28" r="3" fill="white" opacity="0.8"/>
+      <Circle cx="66" cy="28" r="3" fill="white" opacity="0.8"/>
+      {/* Oreilles arrondies hivernales */}
+      <Ellipse cx="38" cy="40" rx="10" ry="14" fill="#1144aa" transform="rotate(-10 38 40)"/>
+      <Ellipse cx="39" cy="40" rx="6" ry="9" fill="#aaddff" opacity="0.5" transform="rotate(-10 39 40)"/>
+      <Ellipse cx="78" cy="40" rx="10" ry="14" fill="#1144aa" transform="rotate(10 78 40)"/>
+      <Ellipse cx="77" cy="40" rx="6" ry="9" fill="#aaddff" opacity="0.5" transform="rotate(10 77 40)"/>
+      {/* Tête */}
+      <Ellipse cx="58" cy="52" rx="27" ry="24" fill="#1655bb"/>
+      <Ellipse cx="48" cy="43" rx="12" ry="9" fill="#66aaee" opacity="0.35"/>
+      {/* Flocon frontal */}
+      <Path d="M58 34 L58 48 M52 36 L64 46 M52 46 L64 36" stroke="#aaddff" strokeWidth="2" opacity="0.9"/>
+      <Circle cx="58" cy="34" r="3.5" fill="white" opacity="0.9"/>
+      {/* Joues neigeuses */}
+      <Ellipse cx="38" cy="57" rx="8" ry="5" fill="#aaddff" opacity="0.45"/>
+      <Ellipse cx="78" cy="57" rx="8" ry="5" fill="#aaddff" opacity="0.45"/>
+      <Circle cx="36" cy="56" r="2" fill="white" opacity="0.6"/>
+      <Circle cx="80" cy="56" r="2" fill="white" opacity="0.6"/>
+      {/* Yeux doux hivernaux */}
+      <Ellipse cx="47" cy="51" rx="8.5" ry="9" fill="#001830"/>
+      <Ellipse cx="47" cy="51" rx="6" ry="6.5" fill="#1155aa"/>
+      <Ellipse cx="47" cy="51" rx="3" ry="3.5" fill="#000c18"/>
+      <Ellipse cx="45" cy="49" rx="2" ry="2.2" fill="white" opacity="0.95"/>
+      <Circle cx="49" cy="53" r="1" fill="#aaddff" opacity="0.7"/>
+      <Ellipse cx="69" cy="51" rx="8.5" ry="9" fill="#001830"/>
+      <Ellipse cx="69" cy="51" rx="6" ry="6.5" fill="#1155aa"/>
+      <Ellipse cx="69" cy="51" rx="3" ry="3.5" fill="#000c18"/>
+      <Ellipse cx="67" cy="49" rx="2" ry="2.2" fill="white" opacity="0.95"/>
+      <Ellipse cx="58" cy="62" rx="3" ry="2" fill="#224466"/>
+      <Path d="M50 66 Q58 73 66 66" stroke="#224466" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+      {/* Pieds */}
+      <Ellipse cx="44" cy="95" rx="11" ry="6" fill="#1144aa"/>
+      <Ellipse cx="72" cy="95" rx="11" ry="6" fill="#1144aa"/>
+    </Svg>
+  );
+}
+
+export function SolaryxSprite({ size = 90 }) {
+  const S = require('react-native-svg');
+  const Svg = S.default, { Ellipse, Path, Polygon, Circle } = S;
+  return (
+    <Svg width={size} height={size} viewBox="0 0 110 110">
+      {/* Aura solaire */}
+      <Circle cx="58" cy="55" r="50" fill="#ffaa00" opacity="0.1"/>
+      <Circle cx="58" cy="55" r="38" fill="#ffdd00" opacity="0.06"/>
+      {/* Rayons solaires */}
+      {[0,22,45,67,90,112,135,157,180,202,225,247,270,292,315,337].map((deg,i)=>(
+        <Path key={i}
+          d={`M58 55 L${58+Math.cos(deg*Math.PI/180)*50} ${55+Math.sin(deg*Math.PI/180)*50}`}
+          stroke="#ffaa00" strokeWidth={i%2===0?1.5:0.8} opacity={i%4===0?0.4:0.2}
+        />
+      ))}
+      {/* Grandes ailes de phénix */}
+      <Path d="M24 52 Q2 22 8 2 Q24 18 30 50Z" fill="#aa4400" opacity="0.9"/>
+      <Path d="M26 50 Q8 24 14 4 Q26 20 32 48Z" fill="#ff6600" opacity="0.4"/>
+      <Path d="M18 65 Q0 52 4 36 Q12 46 20 62Z" fill="#882200" opacity="0.85"/>
+      <Path d="M10 80 Q-2 68 4 55 Q10 64 12 76Z" fill="#661100" opacity="0.7"/>
+      <Path d="M92 52 Q114 22 108 2 Q92 18 86 50Z" fill="#aa4400" opacity="0.9"/>
+      <Path d="M90 50 Q108 24 102 4 Q90 20 84 48Z" fill="#ff6600" opacity="0.4"/>
+      <Path d="M98 65 Q116 52 112 36 Q104 46 96 62Z" fill="#882200" opacity="0.85"/>
+      <Path d="M106 80 Q118 68 112 55 Q106 64 104 76Z" fill="#661100" opacity="0.7"/>
+      {/* Plumes de feu sur ailes */}
+      <Circle cx="16" cy="28" r="3" fill="#ffaa00" opacity="0.6"/>
+      <Circle cx="10" cy="44" r="2.5" fill="#ffcc00" opacity="0.5"/>
+      <Circle cx="100" cy="26" r="3" fill="#ffaa00" opacity="0.6"/>
+      <Circle cx="106" cy="42" r="2.5" fill="#ffcc00" opacity="0.5"/>
+      {/* Queue phénix flamboyante */}
+      <Path d="M15 80 Q2 62 6 44 Q14 58 12 78Z" fill="#880000" opacity="0.95"/>
+      <Polygon points="2,46 -4,38 6,44" fill="#ffaa00"/>
+      <Polygon points="8,60 2,52 10,56" fill="#ff6600"/>
+      <Polygon points="14,72 8,64 14,68" fill="#ffaa00" opacity="0.8"/>
+      {/* Corps doré */}
+      <Ellipse cx="58" cy="72" rx="34" ry="27" fill="#882200"/>
+      <Ellipse cx="58" cy="76" rx="22" ry="17" fill="#ffcc66"/>
+      {/* Écailles solaires */}
+      <Ellipse cx="44" cy="68" rx="10" ry="6" fill="#cc4400" opacity="0.5" transform="rotate(-15 44 68)"/>
+      <Ellipse cx="66" cy="64" rx="10" ry="6" fill="#cc4400" opacity="0.4" transform="rotate(12 66 64)"/>
+      <Ellipse cx="78" cy="72" rx="8" ry="5" fill="#cc4400" opacity="0.4"/>
+      {/* Couronne phénix */}
+      <Path d="M38,30 Q42,14 46,22 Q48,8 52,18 Q54,4 58,14 Q62,4 66,16 Q68,6 72,18 Q76,14 80,28 Q72,18 66,22 Q62,8 58,16 Q54,8 52,20 Q48,10 44,20 Q40,16 38,30Z" fill="#ff6600" opacity="0.9"/>
+      <Path d="M38,30 Q42,16 46,23 Q48,10 52,19" stroke="#ffdd00" strokeWidth="1.5" fill="none" opacity="0.7"/>
+      {/* Crête phénix */}
+      <Polygon points="44,30 48,10 52,30" fill="#ff4400"/>
+      <Polygon points="51,28 55,8 59,28" fill="#ffaa00"/>
+      <Polygon points="58,28 62,8 66,28" fill="#ff4400"/>
+      <Polygon points="65,30 69,12 73,30" fill="#ff4400" opacity="0.8"/>
+      {/* Oreilles feu */}
+      <Polygon points="36,38 28,12 44,36" fill="#660000"/>
+      <Polygon points="38,36 32,14 42,35" fill="#ff6600" opacity="0.4"/>
+      <Polygon points="80,38 88,12 72,36" fill="#660000"/>
+      <Polygon points="78,36 84,14 74,35" fill="#ff6600" opacity="0.4"/>
+      {/* Tête */}
+      <Ellipse cx="58" cy="51" rx="28" ry="25" fill="#aa3300"/>
+      <Ellipse cx="47" cy="42" rx="12" ry="9" fill="#ff7744" opacity="0.35"/>
+      {/* Soleil frontal */}
+      <Circle cx="58" cy="38" r="8" fill="#ffaa00"/>
+      {[0,45,90,135,180,225,270,315].map((deg,i)=>(
+        <Path key={i}
+          d={`M${58+Math.cos(deg*Math.PI/180)*8} ${38+Math.sin(deg*Math.PI/180)*8} L${58+Math.cos(deg*Math.PI/180)*13} ${38+Math.sin(deg*Math.PI/180)*13}`}
+          stroke="#ffdd00" strokeWidth="2" opacity="0.8"
+        />
+      ))}
+      <Circle cx="58" cy="38" r="5" fill="#ffdd44"/>
+      <Circle cx="58" cy="38" r="2.5" fill="white" opacity="0.9"/>
+      {/* Joues dorées */}
+      <Ellipse cx="37" cy="57" rx="8" ry="5" fill="#ffaa00" opacity="0.4"/>
+      <Ellipse cx="79" cy="57" rx="8" ry="5" fill="#ffaa00" opacity="0.4"/>
+      <Circle cx="35" cy="56" r="2" fill="#ffdd00" opacity="0.7"/>
+      <Circle cx="81" cy="56" r="2" fill="#ffdd00" opacity="0.7"/>
+      {/* Yeux phénix */}
+      <Ellipse cx="46" cy="50" rx="9" ry="9.5" fill="#100000"/>
+      <Ellipse cx="46" cy="50" rx="6.5" ry="7" fill="#cc4400"/>
+      <Ellipse cx="46" cy="50" rx="3.2" ry="3.8" fill="#050000"/>
+      <Ellipse cx="44" cy="48" rx="2.2" ry="2.5" fill="#ffdd00" opacity="0.9"/>
+      <Circle cx="48" cy="52" r="1" fill="#ff6600" opacity="0.7"/>
+      <Ellipse cx="70" cy="50" rx="9" ry="9.5" fill="#100000"/>
+      <Ellipse cx="70" cy="50" rx="6.5" ry="7" fill="#cc4400"/>
+      <Ellipse cx="70" cy="50" rx="3.2" ry="3.8" fill="#050000"/>
+      <Ellipse cx="68" cy="48" rx="2.2" ry="2.5" fill="#ffdd00" opacity="0.9"/>
+      {/* Bouche */}
+      <Path d="M48 65 Q58 73 68 65" stroke="#660000" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+      <Ellipse cx="58" cy="63" rx="5" ry="3" fill="#ff6600" opacity="0.3"/>
+      {/* Pieds */}
+      <Ellipse cx="42" cy="97" rx="12" ry="7" fill="#882200"/>
+      <Ellipse cx="74" cy="97" rx="12" ry="7" fill="#882200"/>
+    </Svg>
+  );
+}
+
 export const SPRITES = {
   lumikos:   LumikosSprite,
   lumivex:   LumivexSprite,
@@ -197,6 +601,11 @@ export const SPRITES = {
   thornix:   ThornixSprite,
   stormyx:   StormyxSprite,
   crystara:  CrystaraSprite,
+  astralis:  AstralisSprite,
+  phanteros: PhanterosSprite,
+  drakovyr:  DrakovyrSprite,
+  frostael:  FrostaelSprite,
+  solaryx:   SolaryxSprite,
 };
 
 // ─── CreatureCard ─────────────────────────────────────────────────
