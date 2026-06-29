@@ -11,7 +11,7 @@ import { ref, set, get, onValue, push, remove, serverTimestamp } from 'firebase/
 import { useGameStore } from '../store/useGameStore';
 import { useAuth } from '../store/AuthContext';
 import { SPRITES } from '../components/CreatureCard';
-import { ALL_CREATURES, CREATURES, CREATURE_LIST } from '../data/creatures';
+import { ALL_CREATURES, CREATURES, CREATURE_LIST, EXCLUSIVE_CREATURES } from '../data/creatures';
 import {
   getPlayerName, getPlayerId, setPlayerName,
   createListing, removeListing, buyListing,
@@ -128,6 +128,9 @@ export default function ShopScreen() {
   const uid     = user?.uid || 'guest';
 
   const [mainTab, setMainTab] = useState('Skins');
+  const [exclusiveShop, setExclusiveShop] = useState([]);
+  const [buyingExclusive, setBuyingExclusive] = useState(false);
+  const [exclusiveBuyTarget, setExclusiveBuyTarget] = useState(null);
 
   // ── Skins ──
   const [skinsTab, setSkinsTab]     = useState('Thèmes');
@@ -176,6 +179,14 @@ export default function ShopScreen() {
       } else {
         setOwned({ theme_dark:true, frame_none:true });
       }
+    });
+    onValue(ref(db,'exclusiveShop'),snap=>{
+      if (snap.exists()) {
+        const list = Object.entries(snap.val())
+          .map(([id,v])=>({id,...v}))
+          .filter(s=>s.active&&(s.qty===undefined||(s.soldCount||0)<s.qty));
+        setExclusiveShop(list);
+      } else setExclusiveShop([]);
     });
     get(ref(db, `boxes/${uid}/pity`)).then(s => { if (s.exists()) setPity(s.val()); });
     get(ref(db, `boxes/${uid}/count`)).then(s => { if (s.exists()) setOpenCount(s.val()); });
@@ -259,6 +270,25 @@ export default function ShopScreen() {
     });
     setCodeInput('');
     setCodeLoading(false);
+  }
+
+  // ── Exclusives ──
+  async function buyExclusive(item) {
+    if (crystals < item.price || buyingExclusive) return;
+    setBuyingExclusive(true);
+    const c = EXCLUSIVE_CREATURES[item.creatureId] || ALL_CREATURES[item.creatureId];
+    if (c) {
+      addCrystals(-item.price);
+      addToCollection({...c, uid:`exclusive_${item.id}_${Date.now()}`});
+      // Incrémenter soldCount
+      await set(ref(db,`exclusiveShop/${item.id}/soldCount`),(item.soldCount||0)+1).catch(()=>{});
+      // Désactiver si plus de stock
+      if (item.qty && (item.soldCount||0)+1 >= item.qty) {
+        await set(ref(db,`exclusiveShop/${item.id}/active`),false).catch(()=>{});
+      }
+    }
+    setExclusiveBuyTarget(null);
+    setBuyingExclusive(false);
   }
 
   // ── Box open ──
@@ -421,6 +451,7 @@ export default function ShopScreen() {
             {id:'Boîtes',   emoji:'📦'},
             {id:'Marché',   emoji:'🏪'},
             {id:'Codes',    emoji:'🔑'},
+            {id:'Exclusif',  emoji:'⭐'},
           ].map(t => (
             <TouchableOpacity key={t.id} onPress={() => { setMainTab(t.id); if(t.id!=='Boîtes') resetBox(); setCodeResult(null); }}
               style={[styles.mainTabBtn, mainTab===t.id && styles.mainTabActive]}>
@@ -742,6 +773,81 @@ export default function ShopScreen() {
           </>
         )}
 
+        {/* ══ EXCLUSIF ══ */}
+        {mainTab==='Exclusif' && (
+          <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
+
+            <LinearGradient colors={['#150030','#07090f']} style={[styles.codeHeader,{borderColor:'#bf5fff44'}]}>
+              <Text style={styles.codeHeaderEmoji}>⭐</Text>
+              <Text style={[styles.codeHeaderTitle,{color:'#bf5fff'}]}>BOUTIQUE EXCLUSIVE</Text>
+              <Text style={styles.codeHeaderSub}>Créatures rares disponibles pour une durée limitée !</Text>
+            </LinearGradient>
+
+            {exclusiveShop.length===0?(
+              <View style={styles.empty}>
+                <Text style={{fontSize:48}}>🔒</Text>
+                <Text style={styles.emptyText}>Aucune créature exclusive</Text>
+                <Text style={styles.emptySub}>Reviens lors des prochains événements !</Text>
+              </View>
+            ):exclusiveShop.map(item=>{
+              const c = EXCLUSIVE_CREATURES[item.creatureId]||ALL_CREATURES[item.creatureId];
+              if (!c) return null;
+              const Sprite = SPRITES[item.creatureId?.replace('_shiny','')]||SPRITES.lumikos;
+              const remaining = item.qty?(item.qty-(item.soldCount||0)):null;
+              const canAfford = crystals >= item.price;
+              return (
+                <TouchableOpacity key={item.id} onPress={()=>setExclusiveBuyTarget(item)}
+                  disabled={!canAfford}>
+                  <LinearGradient colors={c.bgGradient||['#0d1220','#07090f']}
+                    style={[styles.exclusiveCard,{borderColor:c.rarityColor+(canAfford?'66':'22')}]}>
+                    {/* Shimmer */}
+                    <View style={[StyleSheet.absoluteFill,{borderRadius:18,overflow:'hidden'}]}>
+                      <LinearGradient colors={['rgba(255,255,255,0.06)','rgba(255,255,255,0)']}
+                        start={{x:0,y:0}} end={{x:1,y:1}} style={{flex:1}}/>
+                    </View>
+                    <View style={styles.exclusiveLeft}>
+                      <Sprite size={80}/>
+                      {remaining!==null&&(
+                        <View style={[styles.exclusiveQty,{backgroundColor:remaining<=3?'#ff444422':'#1e2d4a'}]}>
+                          <Text style={[styles.exclusiveQtyText,{color:remaining<=3?'#ff4444':'#4a6080'}]}>
+                            {remaining} restants
+                          </Text>
+                        </View>
+                      )}
+                    </View>
+                    <View style={styles.exclusiveInfo}>
+                      <View style={[styles.exclusiveRarityBadge,{backgroundColor:c.rarityColor+'22',borderColor:c.rarityColor+'44'}]}>
+                        <Text style={[styles.exclusiveRarityText,{color:c.rarityColor}]}>{c.rarityLabel}</Text>
+                      </View>
+                      <Text style={[styles.exclusiveName,{color:c.rarityColor}]}>{c.name}</Text>
+                      <Text style={styles.exclusiveDesc} numberOfLines={2}>{c.description}</Text>
+                      <View style={styles.exclusiveStats}>
+                        <Text style={styles.exclusiveStat}>❤️ {c.stats.hp}</Text>
+                        <Text style={styles.exclusiveStat}>⚔️ {c.stats.atk}</Text>
+                        <Text style={styles.exclusiveStat}>💨 {c.stats.spd}</Text>
+                      </View>
+                    </View>
+                    <View style={styles.exclusiveRight}>
+                      <Text style={[styles.exclusivePrice,{color:canAfford?'#ffd700':'#ff4444'}]}>
+                        💎 {item.price}
+                      </Text>
+                      <View style={[styles.exclusiveBuyBtn,{
+                        borderColor:c.rarityColor+(canAfford?'66':'22'),
+                        backgroundColor:c.rarityColor+(canAfford?'22':'10'),
+                        opacity:canAfford?1:0.5,
+                      }]}>
+                        <Text style={[styles.exclusiveBuyText,{color:c.rarityColor}]}>
+                          {canAfford?'Acheter':'💎 insuf.'}
+                        </Text>
+                      </View>
+                    </View>
+                  </LinearGradient>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
+        )}
+
         {/* ══ CODES ══ */}
         {mainTab==='Codes' && (
           <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
@@ -817,6 +923,39 @@ export default function ShopScreen() {
 
           </ScrollView>
         )}
+
+        {/* Modal achat exclusive */}
+        <Modal visible={!!exclusiveBuyTarget} transparent animationType="fade" onRequestClose={()=>setExclusiveBuyTarget(null)}>
+          <View style={styles.modalOverlay}>
+            {exclusiveBuyTarget&&(()=>{
+              const c=EXCLUSIVE_CREATURES[exclusiveBuyTarget.creatureId]||ALL_CREATURES[exclusiveBuyTarget.creatureId];
+              return (
+                <LinearGradient colors={c?.bgGradient||['#0d1220','#07090f']} style={[styles.modalBox,{borderColor:c?.rarityColor+'44'}]}>
+                  <Text style={styles.modalTitle}>Confirmer l'achat</Text>
+                  <Text style={[styles.modalName,{color:c?.rarityColor,fontSize:22}]}>{c?.name}</Text>
+                  <Text style={[{color:c?.rarityColor+'88',fontSize:11}]}>{c?.rarityLabel}</Text>
+                  <View style={styles.modalPriceRow}>
+                    <Text style={styles.modalBal}>💎 {crystals}</Text>
+                    <Text style={styles.modalArrow}>→</Text>
+                    <Text style={[styles.modalAfter,{color:crystals>=exclusiveBuyTarget.price?'#39ff8f':'#ff4444'}]}>
+                      💎 {crystals-exclusiveBuyTarget.price}
+                    </Text>
+                  </View>
+                  <TouchableOpacity onPress={()=>buyExclusive(exclusiveBuyTarget)}
+                    style={[styles.modalConfirm,{borderColor:c?.rarityColor+'44',backgroundColor:c?.rarityColor+'22'}]}
+                    disabled={buyingExclusive}>
+                    <Text style={[styles.modalConfirmText,{color:c?.rarityColor}]}>
+                      {buyingExclusive?'Achat...':`Acheter — 💎 ${exclusiveBuyTarget.price}`}
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={()=>setExclusiveBuyTarget(null)} style={styles.modalCancel}>
+                    <Text style={styles.modalCancelText}>Annuler</Text>
+                  </TouchableOpacity>
+                </LinearGradient>
+              );
+            })()}
+          </View>
+        </Modal>
 
         {/* Modal achat skin */}
         <Modal visible={!!preview} transparent animationType="fade" onRequestClose={()=>setPreview(null)}>
@@ -1043,6 +1182,22 @@ const styles = StyleSheet.create({
   modalCancel:{padding:12},
   modalCancelText:{color:'#4a6080',fontSize:13},
   disabled:{opacity:0.4},
+  // Exclusif
+  exclusiveCard:{flexDirection:'row',alignItems:'center',borderWidth:1.5,borderRadius:18,padding:14,gap:12,marginBottom:2},
+  exclusiveLeft:{alignItems:'center',gap:6,width:90},
+  exclusiveQty:{borderRadius:8,paddingHorizontal:8,paddingVertical:3,borderWidth:1,borderColor:'#1e2d4a'},
+  exclusiveQtyText:{fontSize:9,fontWeight:'700'},
+  exclusiveInfo:{flex:1,gap:5},
+  exclusiveRarityBadge:{borderWidth:1,borderRadius:8,paddingHorizontal:7,paddingVertical:3,alignSelf:'flex-start'},
+  exclusiveRarityText:{fontSize:8,fontWeight:'900',letterSpacing:1},
+  exclusiveName:{fontSize:16,fontWeight:'900',letterSpacing:1},
+  exclusiveDesc:{color:'#4a6080',fontSize:10,lineHeight:15},
+  exclusiveStats:{flexDirection:'row',gap:8},
+  exclusiveStat:{fontSize:10,color:'#6a84a0',fontWeight:'700'},
+  exclusiveRight:{alignItems:'center',gap:8},
+  exclusivePrice:{fontSize:14,fontWeight:'900'},
+  exclusiveBuyBtn:{borderWidth:1,borderRadius:12,paddingHorizontal:10,paddingVertical:8,alignItems:'center'},
+  exclusiveBuyText:{fontSize:11,fontWeight:'900'},
   // Codes
   codeHeader:{borderWidth:1,borderRadius:18,padding:20,alignItems:'center',gap:8,marginBottom:4},
   codeHeaderEmoji:{fontSize:48},

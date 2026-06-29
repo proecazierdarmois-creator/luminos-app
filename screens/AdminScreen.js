@@ -64,6 +64,9 @@ export default function AdminScreen() {
   const [releaseMsg, setReleaseMsg]   = useState('');
   const [releaseCrystals, setReleaseCrystals] = useState('0');
   const [releasing, setReleasing]     = useState(false);
+  const [shopExclusives, setShopExclusives] = useState([]);
+  const [shopPrice, setShopPrice]     = useState('500');
+  const [shopQty, setShopQty]         = useState('10');
   const [newCode, setNewCode]         = useState('');
   const [newCodeCreature, setNewCodeCreature] = useState('lumikos');
   const [newCodeCrystals, setNewCodeCrystals] = useState('0');
@@ -102,6 +105,13 @@ export default function AdminScreen() {
   },[]);
 
   useEffect(()=>{
+    const unsubShop = onValue(ref(db,'exclusiveShop'),snap=>{
+      if (snap.exists()) {
+        const list = Object.entries(snap.val()).map(([id,v])=>({id,...v}));
+        setShopExclusives(list);
+      } else setShopExclusives([]);
+    });
+
     const unsubCodes = onValue(ref(db,'codes'),snap=>{
       if (snap.exists()) {
         const list = Object.entries(snap.val()).map(([code,v])=>({code,...v}));
@@ -275,6 +285,31 @@ export default function AdminScreen() {
       showFeedback(`✓ Score de "${guildName}" réinitialisé !`);
       setShowGuildReset(false);
     } catch(e) { showFeedback('Erreur', 'warning'); }
+  }
+
+  // Ajouter une créature exclusive à la boutique
+  async function handleAddToShop() {
+    const c = EXCLUSIVE_CREATURES[releaseCreature];
+    if (!c) return;
+    const price = parseInt(shopPrice)||500;
+    const qty   = parseInt(shopQty)||10;
+    await set(ref(db,`exclusiveShop/${releaseCreature}`),{
+      creatureId: releaseCreature,
+      name: c.name,
+      rarityColor: c.rarityColor,
+      rarityLabel: c.rarityLabel,
+      price,
+      qty,
+      soldCount: 0,
+      createdAt: Date.now(),
+      active: true,
+    }).catch(()=>{});
+    showFeedback(`✓ ${c.name} ajouté à la boutique — ${price} 💎`);
+  }
+
+  async function handleRemoveFromShop(id) {
+    await remove(ref(db,`exclusiveShop/${id}`)).catch(()=>{});
+    showFeedback('✓ Retiré de la boutique','warning');
   }
 
   // Sortir une créature exclusive pour tous les joueurs
@@ -817,6 +852,25 @@ export default function AdminScreen() {
                     onChangeText={setReleaseCrystals} keyboardType="numeric" placeholder="0" placeholderTextColor="#4a6080"/>
                 </View>
 
+                {/* Prix et quantité */}
+                <View style={{flexDirection:'row',gap:8}}>
+                  <View style={{flex:1,gap:4}}>
+                    <Text style={{color:'#4a6080',fontSize:11}}>💎 Prix boutique</Text>
+                    <TextInput style={styles.input} value={shopPrice} onChangeText={setShopPrice}
+                      keyboardType="numeric" placeholder="500" placeholderTextColor="#4a6080"/>
+                  </View>
+                  <View style={{flex:1,gap:4}}>
+                    <Text style={{color:'#4a6080',fontSize:11}}>📦 Quantité</Text>
+                    <TextInput style={styles.input} value={shopQty} onChangeText={setShopQty}
+                      keyboardType="numeric" placeholder="10" placeholderTextColor="#4a6080"/>
+                  </View>
+                </View>
+
+                <TouchableOpacity onPress={handleAddToShop}
+                  style={[styles.mainBtn,{borderColor:'#ffd70044',backgroundColor:'#ffd70015'}]}>
+                  <Text style={[styles.mainBtnText,{color:'#ffd700'}]}>🛍️ Ajouter à la boutique</Text>
+                </TouchableOpacity>
+
                 <TouchableOpacity onPress={handleReleaseCreature} disabled={releasing}
                   style={[styles.mainBtn,{borderColor:'#39ff8f44',backgroundColor:'#39ff8f15'},releasing&&{opacity:0.5}]}>
                   <Text style={[styles.mainBtnText,{color:'#39ff8f'}]}>
@@ -824,10 +878,28 @@ export default function AdminScreen() {
                   </Text>
                 </TouchableOpacity>
               </ActionCard>
+
+              {/* Shop actuel */}
+              {shopExclusives.length>0&&(
+                <ActionCard title="En boutique actuellement" emoji="🛍️">
+                  {shopExclusives.map(s=>(
+                    <View key={s.id} style={[styles.topRow,{borderColor:'#ffd70022'}]}>
+                      <View style={{flex:1,gap:2}}>
+                        <Text style={{color:s.rarityColor,fontWeight:'900',fontSize:13}}>{s.name}</Text>
+                        <Text style={{color:'#4a6080',fontSize:11}}>💎 {s.price} · {s.soldCount||0}/{s.qty} vendus</Text>
+                      </View>
+                      <TouchableOpacity onPress={()=>handleRemoveFromShop(s.id)}
+                        style={[styles.removeBtn]}>
+                        <Text style={styles.removeBtnText}>−</Text>
+                      </TouchableOpacity>
+                    </View>
+                  ))}
+                </ActionCard>
+              )}
             </>
           )}
 
-          {/* ── ANALYTICS ── */}}}
+          {/* ── ANALYTICS ── */}
           {tab==='Analytics'&&(
             <>
               <Text style={styles.sectionLabel}>📊 ANALYTICS JOUEURS</Text>
