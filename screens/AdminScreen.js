@@ -10,6 +10,7 @@ import { ref, get, set, remove, onValue, push } from 'firebase/database';
 import { useAuth } from '../store/AuthContext';
 import { useGameStore } from '../store/useGameStore';
 import { ALL_CREATURES, CREATURE_LIST, EXCLUSIVE_CREATURES } from '../data/creatures';
+import { getCurrentSeasonId, getSeasonLabel, archiveSeasonAndReset } from '../store/seasonService';
 import { getLevelFromXp } from '../store/xpService';
 
 const { width: SW } = Dimensions.get('window');
@@ -64,6 +65,8 @@ export default function AdminScreen() {
   const [releaseMsg, setReleaseMsg]   = useState('');
   const [releaseCrystals, setReleaseCrystals] = useState('0');
   const [releasing, setReleasing]     = useState(false);
+  const [archivingSeasonInProgress, setArchivingSeasonInProgress] = useState(false);
+  const [confirmSeasonReset, setConfirmSeasonReset] = useState(false);
   const [shopExclusives, setShopExclusives] = useState([]);
   const [shopPrice, setShopPrice]     = useState('500');
   const [shopQty, setShopQty]         = useState('10');
@@ -312,6 +315,19 @@ export default function AdminScreen() {
     showFeedback('✓ Retiré de la boutique','warning');
   }
 
+  // Clôturer la saison et distribuer les récompenses
+  async function handleEndSeason() {
+    setArchivingSeasonInProgress(true);
+    try {
+      const snap = await get(ref(db,'leaderboard'));
+      const data = snap.exists() ? snap.val() : {};
+      const result = await archiveSeasonAndReset(data);
+      showFeedback(`✓ Saison ${getSeasonLabel(getCurrentSeasonId())} archivée — ${result.totalPlayers} joueurs récompensés !`);
+      setConfirmSeasonReset(false);
+    } catch(e) { showFeedback('Erreur lors de la clôture','warning'); }
+    setArchivingSeasonInProgress(false);
+  }
+
   // Sortir une créature exclusive pour tous les joueurs
   async function handleReleaseCreature() {
     if (releasing) return;
@@ -467,6 +483,12 @@ export default function AdminScreen() {
                 <StatCard label="Invocations" value={globalStats.totalSummons}   color="#bf5fff" emoji="✦"/>
                 <StatCard label="💎 Total"    value={globalStats.totalCrystals}  color="#ffd700" emoji="💎"/>
               </View>
+
+              {/* Clôture de saison */}
+              <TouchableOpacity onPress={()=>setConfirmSeasonReset(true)}
+                style={[styles.mainBtn,{borderColor:'#ffd70033',backgroundColor:'#ffd70012'}]}>
+                <Text style={[styles.mainBtnText,{color:'#ffd700'}]}>🏆 Clôturer la saison {getSeasonLabel(getCurrentSeasonId())}</Text>
+              </TouchableOpacity>
 
               {/* Reset guildes */}
               <TouchableOpacity onPress={async()=>{
@@ -1055,6 +1077,28 @@ export default function AdminScreen() {
           )}
 
         </ScrollView>
+
+      {/* Modal confirm fin de saison */}
+      <Modal visible={confirmSeasonReset} transparent animationType="fade">
+        <View style={styles.modalOverlay}>
+          <LinearGradient colors={['#1a1000','#07090f']} style={[styles.modalBox,{borderColor:'#ffd70044'}]}>
+            <Text style={{fontSize:44}}>🏆</Text>
+            <Text style={styles.modalTitle}>Clôturer la saison ?</Text>
+            <Text style={styles.modalText}>
+              Tous les joueurs recevront leurs récompenses de fin de saison ({getSeasonLabel(getCurrentSeasonId())}) dans leur boîte de réception, selon leur classement actuel.
+            </Text>
+            <TouchableOpacity onPress={handleEndSeason} disabled={archivingSeasonInProgress}
+              style={[styles.modalDangerBtn,{backgroundColor:'#ffd70022',borderColor:'#ffd70044'}]}>
+              <Text style={[styles.modalDangerBtnText,{color:'#ffd700'}]}>
+                {archivingSeasonInProgress?'Distribution en cours...':'✓ Confirmer et distribuer'}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={()=>setConfirmSeasonReset(false)} style={styles.modalCancelBtn}>
+              <Text style={styles.modalCancelBtnText}>Annuler</Text>
+            </TouchableOpacity>
+          </LinearGradient>
+        </View>
+      </Modal>
 
       {/* Modal reset guilde */}
       <Modal visible={showGuildReset} transparent animationType="slide" onRequestClose={()=>setShowGuildReset(false)}>

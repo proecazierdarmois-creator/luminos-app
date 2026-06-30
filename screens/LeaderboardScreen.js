@@ -11,6 +11,7 @@ import { useGameStore } from '../store/useGameStore';
 import { useAuth } from '../store/AuthContext';
 import { getPlayerId } from '../store/marketService';
 import { CREATURES } from '../data/creatures';
+import { getCurrentSeasonId, getSeasonLabel, getTimeUntilSeasonEnd, listenPastSeasons } from '../store/seasonService';
 
 const { width: SW } = Dimensions.get('window');
 
@@ -208,12 +209,18 @@ export default function LeaderboardScreen() {
   const [loading, setLoading]   = useState(true);
   const [filter, setFilter]     = useState('score');
   const [showPodium, setShowPodium] = useState(true);
+  const [seasonTime, setSeasonTime] = useState(getTimeUntilSeasonEnd());
+  const [pastSeasons, setPastSeasons] = useState([]);
+  const [showHistory, setShowHistory] = useState(false);
 
   const headerAnim = useRef(new Animated.Value(0)).current;
   const listAnims  = useRef(Array.from({length:100},()=>new Animated.Value(0))).current;
 
   useEffect(()=>{
     Animated.timing(headerAnim,{toValue:1,duration:600,useNativeDriver:true}).start();
+    const unsub = listenPastSeasons(setPastSeasons);
+    const interval = setInterval(()=>setSeasonTime(getTimeUntilSeasonEnd()), 60000);
+    return ()=>{ unsub(); clearInterval(interval); };
   },[]);
 
   function animateList(count) {
@@ -302,6 +309,42 @@ export default function LeaderboardScreen() {
           <Text style={styles.title}>🏆 TOP 100</Text>
           <Text style={styles.subtitle}>Classement mondial · Temps réel</Text>
         </Animated.View>
+
+        {/* Bannière saison */}
+        <TouchableOpacity onPress={()=>setShowHistory(v=>!v)}>
+          <LinearGradient colors={['#1a1000','#07090f']} style={styles.seasonBanner}>
+            <View style={{flex:1}}>
+              <Text style={styles.seasonLabel}>📅 SAISON · {getSeasonLabel(getCurrentSeasonId())}</Text>
+              <Text style={styles.seasonTimer}>
+                ⏳ Reset dans {seasonTime.days}j {seasonTime.hours}h
+              </Text>
+            </View>
+            <Text style={styles.seasonHistoryArrow}>{showHistory?'▲':'▼'} Historique</Text>
+          </LinearGradient>
+        </TouchableOpacity>
+
+        {/* Historique des saisons passées */}
+        {showHistory&&(
+          <View style={styles.historyBox}>
+            {pastSeasons.length===0?(
+              <Text style={styles.historyEmpty}>Aucune saison terminée pour l'instant</Text>
+            ):pastSeasons.slice(0,5).map(season=>{
+              const myResult = season.finalLeaderboard?.[playerId];
+              return (
+                <View key={season.id} style={styles.historyRow}>
+                  <Text style={styles.historySeasonName}>{getSeasonLabel(season.id)}</Text>
+                  {myResult?(
+                    <Text style={[styles.historyRank,{color:getRankColor(myResult.rank)}]}>
+                      #{myResult.rank} · {myResult.score} pts
+                    </Text>
+                  ):(
+                    <Text style={styles.historyNoRank}>Non classé</Text>
+                  )}
+                </View>
+              );
+            })}
+          </View>
+        )}
 
         {/* Mon rang */}
         <LinearGradient
@@ -403,6 +446,17 @@ const styles = StyleSheet.create({
   myRankRight:{alignItems:'flex-end',gap:2},
   myScoreVal:{fontSize:18,fontWeight:'900',flexShrink:1},
   myScoreLbl:{fontSize:8,color:'#4a6080'},
+  // Season
+  seasonBanner:{flexDirection:'row',alignItems:'center',borderWidth:1,borderColor:'#ffd70033',borderRadius:14,padding:12,marginBottom:8,gap:8},
+  seasonLabel:{color:'#ffd700',fontSize:11,fontWeight:'900',letterSpacing:1},
+  seasonTimer:{color:'#4a6080',fontSize:10,marginTop:2},
+  seasonHistoryArrow:{color:'#4a6080',fontSize:10,fontWeight:'700'},
+  historyBox:{backgroundColor:'#0d1220',borderWidth:1,borderColor:'#1e2d4a',borderRadius:14,padding:12,marginBottom:8,gap:8},
+  historyEmpty:{color:'#4a6080',fontSize:12,textAlign:'center',fontStyle:'italic',paddingVertical:8},
+  historyRow:{flexDirection:'row',justifyContent:'space-between',alignItems:'center',paddingVertical:4,borderBottomWidth:1,borderBottomColor:'#1e2d4a'},
+  historySeasonName:{color:'#c8daf0',fontSize:12,fontWeight:'700'},
+  historyRank:{fontSize:12,fontWeight:'800'},
+  historyNoRank:{color:'#4a6080',fontSize:11,fontStyle:'italic'},
   // Filtres
   filterRow:{flexDirection:'row',gap:6,marginBottom:8},
   filterBtn:{flex:1,alignItems:'center',paddingVertical:8,borderRadius:10,borderWidth:1,borderColor:'#1e2d4a',backgroundColor:'#0d1220'},
