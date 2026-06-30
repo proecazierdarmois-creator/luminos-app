@@ -28,6 +28,7 @@ const QUICK_ACTIONS = [
   { label:'Tournoi',   icon:'🏆', screen:'Tournament', color:'#ff6b35', bg:['#180800','#281200'] },
   { label:'Éclipse',   icon:'🌑', screen:'Eclipse',    color:'#bf5fff', bg:['#0a0018','#150030'] },
   { label:'News',      icon:'📰', screen:'News',        color:'#ffa500', bg:['#1a0e00','#0d0700'] },
+  { label:'Casino',    icon:'🎰', screen:'SlotMachine', color:'#ff4fa3', bg:['#180008','#0d0004'] },
 ];
 
 function Star({ x, y, size, delay }) {

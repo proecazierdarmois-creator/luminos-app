@@ -33,6 +33,7 @@ import AdminScreen       from './screens/AdminScreen';
 import HomeScreen        from './screens/HomeScreen';
 import NewsScreen        from './screens/NewsScreen';
 import InboxScreen       from './screens/InboxScreen';
+import SlotMachineScreen from './screens/SlotMachineScreen';
 
 const Tab = createBottomTabNavigator();
 const ADMIN_UID = 'NpKZ4aF5kVMlZTN3W8Wy3GCNOhK2';
@@ -108,6 +109,8 @@ function MainTabs() {
       <Tab.Screen name="Eclipse"      component={EclipseScreen}
         options={{ tabBarIcon: ({ focused }) => <TabIcon icon="🌑" label="ÉCLIPSE"   focused={focused} color="#bf5fff" /> }} />
       <Tab.Screen name="Inbox" component={InboxScreen}
+        options={{ tabBarButton:()=>null, tabBarStyle:{display:'none'} }}/>
+      <Tab.Screen name="SlotMachine" component={SlotMachineScreen}
         options={{ tabBarButton:()=>null, tabBarStyle:{display:'none'} }}/>
       <Tab.Screen name="Battle"       component={BattleScreen}
         options={{ tabBarIcon: ({ focused }) => <TabIcon icon="🗡️" label="COMBAT"    focused={focused} color="#ff6b35" /> }} />
