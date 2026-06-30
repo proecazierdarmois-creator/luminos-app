@@ -7,6 +7,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { useGameStore } from '../store/useGameStore';
 import { ALL_CREATURES, CREATURE_LIST } from '../data/creatures';
+import { SPRITES } from '../components/CreatureCard';
 
 const { width: SW, height: SH } = Dimensions.get('window');
 
@@ -778,6 +779,7 @@ export default function WorldScreen() {
 
   if(phase==='encounter'&&encounter){
     const creature=ALL_CREATURES[encounter.id];
+    const EncSprite=SPRITES[encounter.id?.replace('_shiny','')]||SPRITES.lumikos;
     const EncounterScreen = React.memo(()=>{
       const scaleAnim = React.useRef(new Animated.Value(0)).current;
       const glowAnim  = React.useRef(new Animated.Value(0)).current;
@@ -813,11 +815,12 @@ export default function WorldScreen() {
             <View style={styles.encounterArea}>
               {/* Badge apparition */}
               <Animated.View style={[styles.encounterBadge,{
-                backgroundColor:encounter.color+'22',borderColor:encounter.color+'44',
+                backgroundColor:encounter.color+'22',borderColor:encounter.color+'55',
                 opacity:glowAnim.interpolate({inputRange:[0,1],outputRange:[0.7,1]}),
+                transform:[{scale:glowAnim.interpolate({inputRange:[0,1],outputRange:[0.98,1.04]})}],
               }]}>
                 <Text style={[styles.encounterBadgeText,{color:encounter.color}]}>
-                  {encounter.rarity==='legendary'?'🌟 LÉGENDAIRE !':encounter.rarity==='rare'?'◆ RARE':encounter.rarity==='shiny'?'✨ SHINY':'✦ Une créature apparaît !'}
+                  {encounter.rarity==='legendary'?'🌟 LÉGENDAIRE !':encounter.rarity==='exclusive'?'⭐ EXCLUSIF !':encounter.rarity==='rare'?'◆ RARE':encounter.rarity==='shiny'?'✨ SHINY':'✦ Une créature apparaît !'}
                 </Text>
               </Animated.View>
 
@@ -829,9 +832,11 @@ export default function WorldScreen() {
                   shadowColor:encounter.color,shadowRadius:30,shadowOpacity:glowAnim.interpolate({inputRange:[0,1],outputRange:[0.3,0.8]}),
                   alignItems:'center',
                 }}>
-                  <Text style={{fontSize:80}}>
-                    {encounter.rarity==='legendary'?'🌟':encounter.rarity==='rare'?'◆':'✦'}
-                  </Text>
+                  {EncSprite ? <EncSprite size={130}/> : (
+                    <Text style={{fontSize:80}}>
+                      {encounter.rarity==='legendary'?'🌟':encounter.rarity==='rare'?'◆':'✦'}
+                    </Text>
+                  )}
                 </Animated.View>
               </Animated.View>
 
@@ -842,6 +847,10 @@ export default function WorldScreen() {
                 transform:[{translateY:slideAnim}],
               }]}>
                 <LinearGradient colors={creature?.bgGradient||['#0d1220','#07090f']} style={styles.encounterCardGrad}>
+                  <View style={[StyleSheet.absoluteFill,{borderRadius:20,overflow:'hidden'}]}>
+                    <LinearGradient colors={['rgba(255,255,255,0.05)','rgba(255,255,255,0)']}
+                      start={{x:0,y:0}} end={{x:1,y:1}} style={{flex:1}}/>
+                  </View>
                   <Text style={[styles.encounterName,{color:encounter.color}]}>{encounter.name}</Text>
                   <View style={styles.encounterTagRow}>
                     <View style={[styles.typeTag,{backgroundColor:encounter.color+'22',borderColor:encounter.color+'44'}]}>
@@ -867,11 +876,14 @@ export default function WorldScreen() {
               <View style={styles.encounterBtns}>
                 <TouchableOpacity onPress={handleCapture}
                   disabled={crystals<3}
-                  style={[styles.captureBtn,{borderColor:encounter.color+'66'},crystals<3&&styles.disabled]}>
-                  <LinearGradient colors={[encounter.color+'55',encounter.color+'22']}
+                  style={[styles.captureBtn,{borderColor:encounter.color+'77'},crystals<3&&styles.disabled]}>
+                  <LinearGradient colors={[encounter.color+'66',encounter.color+'33']}
                     start={{x:0,y:0}} end={{x:1,y:0}} style={styles.captureBtnGrad}>
-                    <Text style={[styles.captureBtnText,{color:encounter.color}]}>
-                      {crystals>=3?`✦ CAPTURER — 3 💎`:`Pas assez de cristaux (${crystals}/3 💎)`}
+                    <Text style={[styles.captureBtnText,{color:'#fff'}]}>
+                      {crystals>=3?`✦ CAPTURER`:`Pas assez de cristaux`}
+                    </Text>
+                    <Text style={[styles.captureBtnSub,{color:'#ffffffaa'}]}>
+                      {crystals>=3?`Coûte 3 💎`:`${crystals}/3 💎`}
                     </Text>
                   </LinearGradient>
                 </TouchableOpacity>
@@ -910,7 +922,9 @@ export default function WorldScreen() {
                 transform:[{scale:glowAnim.interpolate({inputRange:[0,1],outputRange:[0.95,1.05]})}],
               }]}>✦ ✦ ✦</Animated.Text>
               <Text style={[styles.caughtTitle,{color:encounter.color}]}>CAPTURÉ !</Text>
-              <Animated.Text style={{fontSize:72,transform:[{scale:scaleAnim}]}}>🎉</Animated.Text>
+              <Animated.View style={{transform:[{scale:scaleAnim}]}}>
+                {(SPRITES[encounter.id?.replace('_shiny','')]||SPRITES.lumikos)({size:110})}
+              </Animated.View>
               <Text style={[styles.encounterName,{color:encounter.color}]}>{encounter.name}</Text>
               <Text style={styles.encounterDesc}>{ALL_CREATURES[encounter.id]?.description}</Text>
               <Text style={styles.caughtXp}>+20 XP · Ajouté à ta collection</Text>
@@ -967,6 +981,7 @@ const styles = StyleSheet.create({
   captureBtn:{borderRadius:14,overflow:'hidden',borderWidth:1},
   captureBtnGrad:{alignItems:'center',paddingVertical:16},
   captureBtnText:{fontSize:15,fontWeight:'800',letterSpacing:2},
+  captureBtnSub:{fontSize:10,fontWeight:'600',marginTop:2},
   fleeBtn:{alignItems:'center',padding:12},
   fleeBtnText:{color:'#4a6080',fontSize:13},
   caughtTitle:{fontSize:26,fontWeight:'900',letterSpacing:4},
