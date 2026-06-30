@@ -7,7 +7,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { useGameStore } from '../store/useGameStore';
 import { SPRITES } from '../components/CreatureCard';
-import { ALL_CREATURES, CREATURES, CREATURE_LIST, EXCLUSIVE_CREATURES } from '../data/creatures';
+import { ALL_CREATURES, CREATURES, CREATURE_LIST } from '../data/creatures';
 
 const { width: SW } = Dimensions.get('window');
 const CARD_W = (SW - 48) / 3;
@@ -255,15 +255,13 @@ export default function CollectionScreen() {
   },[]);
 
   const uniqueOwned    = new Set(collection.map(c=>c.id)).size;
-  const totalCreatures = CREATURE_LIST.length + Object.keys(EXCLUSIVE_CREATURES).length;
+  const totalCreatures = CREATURE_LIST.length;
   const shinysOwned    = collection.filter(c=>c.isShiny).length;
   const legendsOwned   = new Set(collection.filter(c=>CREATURES[c.id]?.rarity==='legendary').map(c=>c.id)).size;
   const pct = Math.round((uniqueOwned/totalCreatures)*100);
   const completionColor = pct>=80?'#39ff8f':pct>=50?'#ffd700':'#00e5ff';
 
-  const exclusiveList = Object.values(EXCLUSIVE_CREATURES);
-  const fullList = [...CREATURE_LIST, ...exclusiveList];
-  const pokedex = fullList.map(c=>({
+  const pokedex = CREATURE_LIST.map(c=>({
     ...c,
     owned:collection.filter(x=>x.id===c.id).length,
     isShiny:collection.some(x=>x.id===c.id&&x.isShiny),

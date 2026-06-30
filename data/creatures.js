@@ -594,7 +594,10 @@ Object.assign(CREATURES, {
   floriva: FLORIVA, glacirath: GLACIRATH, voltaris: VOLTARIS,
 });
 
-export const ALL_CREATURES  = { ...CREATURES, ...SHINY_CREATURES, ...EXCLUSIVE_CREATURES };
+// Fusionne les exclusives dans CREATURES (visibles partout : collection, invocation exclue via dropRate:0)
+Object.assign(CREATURES, EXCLUSIVE_CREATURES);
+
+export const ALL_CREATURES  = { ...CREATURES, ...SHINY_CREATURES };
 export const CREATURE_LIST  = Object.values(CREATURES);
 export const SHINY_LIST     = Object.values(SHINY_CREATURES);
 
