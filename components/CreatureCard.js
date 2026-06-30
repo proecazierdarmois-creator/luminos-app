@@ -574,6 +574,170 @@ export function SolaryxSprite({ size = 90 }) {
   );
 }
 
+
+// ─── Sprites V4 ───────────────────────────────────────────────────
+
+export function SonarixSprite({ size = 90 }) {
+  const S = require('react-native-svg');
+  const Svg = S.default, { Ellipse, Path, Circle, Polygon } = S;
+  return (
+    <Svg width={size} height={size} viewBox="0 0 110 110">
+      {/* Ondes sonores */}
+      <Path d="M14 55 Q10 55 10 50" stroke="#dd66ff" strokeWidth="2" fill="none" opacity="0.5"/>
+      <Path d="M8 55 Q2 55 2 45" stroke="#dd66ff" strokeWidth="2" fill="none" opacity="0.3"/>
+      <Path d="M96 55 Q100 55 100 50" stroke="#dd66ff" strokeWidth="2" fill="none" opacity="0.5"/>
+      <Path d="M102 55 Q108 55 108 45" stroke="#dd66ff" strokeWidth="2" fill="none" opacity="0.3"/>
+      {/* Grandes oreilles paraboliques */}
+      <Ellipse cx="34" cy="36" rx="13" ry="20" fill="#9933cc" transform="rotate(-15 34 36)"/>
+      <Ellipse cx="35" cy="36" rx="8" ry="14" fill="#dd66ff" opacity="0.6" transform="rotate(-15 35 36)"/>
+      <Ellipse cx="36" cy="36" rx="4" ry="8" fill="#f0aaff" opacity="0.6" transform="rotate(-15 36 36)"/>
+      <Ellipse cx="82" cy="36" rx="13" ry="20" fill="#9933cc" transform="rotate(15 82 36)"/>
+      <Ellipse cx="81" cy="36" rx="8" ry="14" fill="#dd66ff" opacity="0.6" transform="rotate(15 81 36)"/>
+      <Ellipse cx="80" cy="36" rx="4" ry="8" fill="#f0aaff" opacity="0.6" transform="rotate(15 80 36)"/>
+      {/* Queue ondulée */}
+      <Path d="M16 80 Q26 70 16 60 Q26 50 18 42" stroke="#9933cc" strokeWidth="8" fill="none" strokeLinecap="round"/>
+      {/* Corps */}
+      <Ellipse cx="58" cy="74" rx="29" ry="24" fill="#8822bb"/>
+      <Ellipse cx="58" cy="78" rx="18" ry="14" fill="#e8c0ff"/>
+      {/* Tête */}
+      <Ellipse cx="58" cy="52" rx="25" ry="22" fill="#9933cc"/>
+      <Ellipse cx="49" cy="44" rx="11" ry="8" fill="#cc77ee" opacity="0.4"/>
+      {/* Bouche sonore ouverte */}
+      <Ellipse cx="58" cy="63" rx="7" ry="6" fill="#1a0030"/>
+      <Ellipse cx="58" cy="63" rx="4" ry="3.5" fill="#dd66ff" opacity="0.5"/>
+      {/* Yeux */}
+      <Ellipse cx="47" cy="51" rx="6.5" ry="7" fill="#1a0030"/>
+      <Ellipse cx="47" cy="51" rx="4.2" ry="4.5" fill="#cc55ee"/>
+      <Ellipse cx="47" cy="51" rx="2" ry="2.2" fill="#0a0018"/>
+      <Ellipse cx="45.5" cy="49.5" rx="1.3" ry="1.5" fill="white" opacity="0.9"/>
+      <Ellipse cx="69" cy="51" rx="6.5" ry="7" fill="#1a0030"/>
+      <Ellipse cx="69" cy="51" rx="4.2" ry="4.5" fill="#cc55ee"/>
+      <Ellipse cx="69" cy="51" rx="2" ry="2.2" fill="#0a0018"/>
+      <Ellipse cx="67.5" cy="49.5" rx="1.3" ry="1.5" fill="white" opacity="0.9"/>
+      {/* Pieds */}
+      <Ellipse cx="44" cy="95" rx="9" ry="5" fill="#8822bb"/>
+      <Ellipse cx="72" cy="95" rx="9" ry="5" fill="#8822bb"/>
+    </Svg>
+  );
+}
+
+export function MagnetarSprite({ size = 90 }) {
+  const S = require('react-native-svg');
+  const Svg = S.default, { Ellipse, Path, Circle, Polygon, Rect } = S;
+  return (
+    <Svg width={size} height={size} viewBox="0 0 110 110">
+      {/* Lignes de champ magnétique */}
+      <Path d="M20 30 Q35 20 50 30" stroke="#7799cc" strokeWidth="1.5" fill="none" opacity="0.4"/>
+      <Path d="M60 30 Q75 20 90 30" stroke="#7799cc" strokeWidth="1.5" fill="none" opacity="0.4"/>
+      {/* Débris métalliques attirés */}
+      <Rect x="15" y="45" width="4" height="4" fill="#aaccee" opacity="0.6" transform="rotate(30 15 45)"/>
+      <Rect x="92" y="40" width="3" height="3" fill="#aaccee" opacity="0.6" transform="rotate(-20 92 40)"/>
+      <Circle cx="20" cy="60" r="2" fill="#aaccee" opacity="0.5"/>
+      {/* Aimants en U sur le dos */}
+      <Path d="M40 32 Q40 22 46 22 L46 30 Q46 26 50 26 L50 32" fill="#cc4422"/>
+      <Path d="M60 32 Q60 22 66 22 L66 30 Q66 26 70 26 L70 32" fill="#3366cc"/>
+      {/* Corps anguleux métallique */}
+      <Ellipse cx="58" cy="74" rx="30" ry="25" fill="#445566"/>
+      <Ellipse cx="58" cy="78" rx="19" ry="15" fill="#aaccee"/>
+      {/* Plaques métalliques */}
+      <Polygon points="42,68 50,60 58,68 50,76" fill="#667788" opacity="0.6"/>
+      <Polygon points="58,66 66,58 74,66 66,74" fill="#667788" opacity="0.6"/>
+      {/* Oreilles métalliques pointues */}
+      <Polygon points="38,40 32,18 46,38" fill="#445566"/>
+      <Polygon points="40,38 36,20 45,37" fill="#aaccee" opacity="0.5"/>
+      <Polygon points="78,40 84,18 70,38" fill="#445566"/>
+      <Polygon points="76,38 80,20 71,37" fill="#aaccee" opacity="0.5"/>
+      {/* Tête */}
+      <Ellipse cx="58" cy="52" rx="26" ry="23" fill="#556677"/>
+      <Ellipse cx="49" cy="44" rx="11" ry="8" fill="#88aacc" opacity="0.35"/>
+      {/* Boussole frontale */}
+      <Circle cx="58" cy="38" r="7" fill="#1a2230"/>
+      <Path d="M58 32 L61 38 L58 44 L55 38 Z" fill="#cc4422"/>
+      <Circle cx="58" cy="38" r="2" fill="#aaccee"/>
+      {/* Joues */}
+      <Ellipse cx="38" cy="57" rx="7" ry="5" fill="#7799cc" opacity="0.4"/>
+      <Ellipse cx="78" cy="57" rx="7" ry="5" fill="#7799cc" opacity="0.4"/>
+      {/* Yeux métalliques */}
+      <Ellipse cx="47" cy="51" rx="7" ry="7.5" fill="#0a1018"/>
+      <Ellipse cx="47" cy="51" rx="4.5" ry="5" fill="#3355aa"/>
+      <Ellipse cx="47" cy="51" rx="2" ry="2.5" fill="#000810"/>
+      <Ellipse cx="45.5" cy="49.5" rx="1.4" ry="1.6" fill="white" opacity="0.9"/>
+      <Ellipse cx="69" cy="51" rx="7" ry="7.5" fill="#0a1018"/>
+      <Ellipse cx="69" cy="51" rx="4.5" ry="5" fill="#3355aa"/>
+      <Ellipse cx="69" cy="51" rx="2" ry="2.5" fill="#000810"/>
+      <Ellipse cx="67.5" cy="49.5" rx="1.4" ry="1.6" fill="white" opacity="0.9"/>
+      <Ellipse cx="58" cy="61" rx="2.5" ry="1.6" fill="#223344"/>
+      <Path d="M51 65 Q58 70 65 65" stroke="#223344" strokeWidth="2" fill="none" strokeLinecap="round"/>
+      {/* Pieds */}
+      <Ellipse cx="44" cy="95" rx="10" ry="6" fill="#445566"/>
+      <Ellipse cx="72" cy="95" rx="10" ry="6" fill="#445566"/>
+    </Svg>
+  );
+}
+
+export function ChronexisSprite({ size = 90 }) {
+  const S = require('react-native-svg');
+  const Svg = S.default, { Ellipse, Path, Circle, Polygon, Line } = S;
+  return (
+    <Svg width={size} height={size} viewBox="0 0 110 110">
+      {/* Aura temporelle */}
+      <Circle cx="58" cy="55" r="50" fill="#44ddaa" opacity="0.08"/>
+      {/* Cadrans orbitaux */}
+      <Circle cx="18" cy="30" r="8" fill="none" stroke="#44ddaa" strokeWidth="1.5" opacity="0.6"/>
+      <Line x1="18" y1="30" x2="18" y2="25" stroke="#44ddaa" strokeWidth="1" opacity="0.6"/>
+      <Circle cx="94" cy="32" r="6" fill="none" stroke="#88ffcc" strokeWidth="1.5" opacity="0.5"/>
+      {/* Grandes ailes engrenage */}
+      <Path d="M30 55 Q8 32 12 10 Q26 25 34 52Z" fill="#006644" opacity="0.85"/>
+      <Path d="M32 53 Q14 33 18 14 Q28 27 36 50Z" fill="#44ddaa" opacity="0.3"/>
+      <Path d="M86 55 Q108 32 104 10 Q90 25 82 52Z" fill="#006644" opacity="0.85"/>
+      <Path d="M84 53 Q102 33 98 14 Q88 27 80 50Z" fill="#44ddaa" opacity="0.3"/>
+      {/* Petits engrenages sur ailes */}
+      <Circle cx="20" cy="32" r="5" fill="none" stroke="#88ffcc" strokeWidth="1.2" opacity="0.7"/>
+      <Circle cx="96" cy="30" r="4" fill="none" stroke="#88ffcc" strokeWidth="1.2" opacity="0.7"/>
+      {/* Queue spirale temporelle */}
+      <Path d="M18 80 Q8 68 14 56 Q20 64 18 76 Q24 70 20 60" stroke="#008855" strokeWidth="7" fill="none" strokeLinecap="round"/>
+      {/* Corps */}
+      <Ellipse cx="58" cy="73" rx="31" ry="25" fill="#007050"/>
+      <Ellipse cx="58" cy="77" rx="20" ry="15" fill="#bbffe0"/>
+      {/* Petits rouages décoratifs sur corps */}
+      <Circle cx="46" cy="68" r="4" fill="none" stroke="#44ddaa" strokeWidth="1" opacity="0.5"/>
+      <Circle cx="70" cy="70" r="3" fill="none" stroke="#44ddaa" strokeWidth="1" opacity="0.5"/>
+      {/* Oreilles en aiguilles d'horloge */}
+      <Path d="M40 40 L36 16" stroke="#005540" strokeWidth="6" strokeLinecap="round"/>
+      <Path d="M40 40 L30 22" stroke="#44ddaa" strokeWidth="3" strokeLinecap="round" opacity="0.7"/>
+      <Path d="M76 40 L80 16" stroke="#005540" strokeWidth="6" strokeLinecap="round"/>
+      <Path d="M76 40 L86 22" stroke="#44ddaa" strokeWidth="3" strokeLinecap="round" opacity="0.7"/>
+      {/* Tête */}
+      <Ellipse cx="58" cy="52" rx="27" ry="24" fill="#008860"/>
+      <Ellipse cx="48" cy="43" rx="12" ry="9" fill="#44ddaa" opacity="0.3"/>
+      {/* Grande horloge frontale */}
+      <Circle cx="58" cy="38" r="9" fill="#003a28"/>
+      <Circle cx="58" cy="38" r="7" fill="#bbffe0"/>
+      <Line x1="58" y1="38" x2="58" y2="33" stroke="#003a28" strokeWidth="1.5"/>
+      <Line x1="58" y1="38" x2="62" y2="40" stroke="#003a28" strokeWidth="1.5"/>
+      <Circle cx="58" cy="38" r="1.5" fill="#003a28"/>
+      {/* Joues */}
+      <Ellipse cx="38" cy="57" rx="8" ry="5" fill="#44ddaa" opacity="0.4"/>
+      <Ellipse cx="78" cy="57" rx="8" ry="5" fill="#44ddaa" opacity="0.4"/>
+      {/* Yeux temporels */}
+      <Ellipse cx="47" cy="51" rx="8" ry="8.5" fill="#001a10"/>
+      <Ellipse cx="47" cy="51" rx="5.5" ry="6" fill="#22aa77"/>
+      <Ellipse cx="47" cy="51" rx="2.5" ry="3" fill="#000a08"/>
+      <Ellipse cx="45.5" cy="49.5" rx="1.8" ry="2" fill="white" opacity="0.95"/>
+      <Circle cx="49" cy="53" r="1" fill="#88ffcc" opacity="0.7"/>
+      <Ellipse cx="69" cy="51" rx="8" ry="8.5" fill="#001a10"/>
+      <Ellipse cx="69" cy="51" rx="5.5" ry="6" fill="#22aa77"/>
+      <Ellipse cx="69" cy="51" rx="2.5" ry="3" fill="#000a08"/>
+      <Ellipse cx="67.5" cy="49.5" rx="1.8" ry="2" fill="white" opacity="0.95"/>
+      <Ellipse cx="58" cy="62" rx="3" ry="2" fill="#005540"/>
+      <Path d="M50 66 Q58 73 66 66" stroke="#005540" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+      {/* Pieds */}
+      <Ellipse cx="44" cy="95" rx="11" ry="6" fill="#007050"/>
+      <Ellipse cx="72" cy="95" rx="11" ry="6" fill="#007050"/>
+    </Svg>
+  );
+}
+
 export const SPRITES = {
   lumikos:   LumikosSprite,
   lumivex:   LumivexSprite,
@@ -606,6 +770,9 @@ export const SPRITES = {
   drakovyr:  DrakovyrSprite,
   frostael:  FrostaelSprite,
   solaryx:   SolaryxSprite,
+  sonarix:   SonarixSprite,
+  magnetar:  MagnetarSprite,
+  chronexis: ChronexisSprite,
 };
 
 // ─── CreatureCard ─────────────────────────────────────────────────
