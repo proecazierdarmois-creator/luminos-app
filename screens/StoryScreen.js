@@ -12,6 +12,7 @@ import { useAuth } from '../store/AuthContext';
 import { SPRITES } from '../components/CreatureCard';
 import { ALL_CREATURES } from '../data/creatures';
 import { addXp, XP_REWARDS } from '../store/xpService';
+import { useToast } from '../store/ToastContext';
 import { auth } from '../config/firebase';
 
 const { width: SW } = Dimensions.get('window');
@@ -229,6 +230,7 @@ const CHAPTERS = [
 
 export default function StoryScreen() {
   const { collection, wins, summonCount, addCrystals, addToCollection } = useGameStore();
+  const { showToast } = useToast();
   const authCtx = useAuth();
   const uid     = authCtx?.user?.uid || 'guest';
 
@@ -243,9 +245,16 @@ export default function StoryScreen() {
   const slideAnim = useRef(new Animated.Value(30)).current;
   const charAnim  = useRef(new Animated.Value(0)).current;
   const textAnim  = useRef(new Animated.Value(0)).current;
+  const pulseAnim = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
     Animated.timing(fadeAnim,{toValue:1,duration:600,useNativeDriver:true}).start();
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseAnim,{toValue:1.06,duration:1200,useNativeDriver:true}),
+        Animated.timing(pulseAnim,{toValue:1,   duration:1200,useNativeDriver:true}),
+      ])
+    ).start();
   },[]);
 
   useEffect(() => {
@@ -342,6 +351,10 @@ export default function StoryScreen() {
     const newClaimed = {...claimedRewards, [activeQuest.id]:true};
     setClaimedRewards(newClaimed);
     await saveProgress(progress, newClaimed);
+    showToast({
+      type:'reward', title:'Quête terminée !', message:activeQuest.title,
+      crystals:cry||0, xp:activeQuest.xp||0, duration:4000,
+    });
     setPhase('chapter'); animateIn();
   }
 
@@ -383,10 +396,13 @@ export default function StoryScreen() {
                 translateX:charAnim.interpolate({inputRange:[0,1],outputRange:[isPlayer?20:-20,0]})
               }]}
             ]}>
-              <View style={[styles.charBubble,{backgroundColor:currentChar?.bg,borderColor:currentChar?.color+'44'}]}>
+              <Animated.View style={[styles.charBubble,{
+                backgroundColor:currentChar?.bg,borderColor:currentChar?.color+'55',
+                transform:[{scale:pulseAnim}],
+              }]}>
                 <Text style={styles.charEmoji}>{currentChar?.emoji}</Text>
                 <Text style={[styles.charName,{color:currentChar?.color}]}>{currentChar?.name}</Text>
-              </View>
+              </Animated.View>
             </Animated.View>
 
             {/* Bulle de texte */}
@@ -445,7 +461,7 @@ export default function StoryScreen() {
             <Text style={styles.rewardTitle}>Quête terminée !</Text>
             <Text style={[styles.rewardQuestName,{color:activeChapter?.color}]}>{activeQuest.title}</Text>
 
-            <View style={[styles.rewardBox,{borderColor:activeChapter?.color+'44'}]}>
+            <LinearGradient colors={[activeChapter?.color+'12','#0d1220']} style={[styles.rewardBox,{borderColor:activeChapter?.color+'44'}]}>
               <Text style={styles.rewardLabel}>RÉCOMPENSES</Text>
               {cry>0&&(
                 <View style={styles.rewardRow}>
@@ -462,7 +478,7 @@ export default function StoryScreen() {
                   <Text style={styles.rewardCreatureRarity}>{ALL_CREATURES[creature].rarityLabel}</Text>
                 </View>
               )}
-            </View>
+            </LinearGradient>
 
             <TouchableOpacity onPress={claimReward} disabled={alreadyClaimed}
               style={[styles.claimBtn,{borderColor:activeChapter?.color+'66'},alreadyClaimed&&styles.disabled]}>
@@ -688,7 +704,7 @@ const styles = StyleSheet.create({
   chapterBarFill:{height:'100%',borderRadius:4},
   chapterCardProg:{fontSize:10,fontWeight:'700',marginTop:2},
   chapterCardRight:{width:30,alignItems:'center'},
-  lockIcon:{fontSize:20},
+  lockIcon:{fontSize:20,opacity:0.6},
   doneIcon:{fontSize:16,fontWeight:'900'},
   doneBadge:{borderWidth:1,borderRadius:10,paddingHorizontal:8,paddingVertical:5,alignItems:'center'},
   inProgressBadge:{borderWidth:1,borderRadius:10,paddingHorizontal:8,paddingVertical:5,alignItems:'center'},
