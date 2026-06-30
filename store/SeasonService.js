@@ -80,8 +80,20 @@ export async function archiveSeasonAndReset(currentLeaderboard) {
     }
   }
 
-  // Reset le leaderboard actuel (scores remis à 0, mais garde les decks/collections)
-  // On ne supprime PAS le leaderboard, on le déplace juste — un nouveau se reconstruit au fil du jeu
+  // Reset réel du classement de saison.
+  // Pour chaque joueur, on enregistre un "offset" = ses stats actuelles.
+  // Le score de saison affiché = stats actuelles - offset, ce qui le ramène à 0
+  // sans toucher à sa collection, ses cristaux ou ses stats globales réelles.
+  for (const p of sorted) {
+    await set(ref(db,`seasonOffsets/${p.id}`), {
+      wins: p.wins||0,
+      score: p.score||0,
+      resetAt: Date.now(),
+    }).catch(()=>{});
+  }
+  // Supprime le leaderboard de saison affiché (sera recalculé avec l'offset)
+  await set(ref(db,'leaderboard'), null).catch(()=>{});
+
   return { seasonId, totalPlayers: sorted.length };
 }
 
@@ -101,4 +113,10 @@ export function listenMySeasonTitles(uid, callback) {
   return onValue(ref(db,`players/${uid}/seasonTitles`), snap=>{
     callback(snap.exists() ? snap.val() : {});
   });
+}
+
+// ─── Offset de saison (pour calculer le score "depuis le reset") ──
+export async function getSeasonOffset(uid) {
+  const snap = await get(ref(db,`seasonOffsets/${uid}`));
+  return snap.exists() ? snap.val() : { wins:0, score:0 };
 }

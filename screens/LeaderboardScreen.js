@@ -11,7 +11,7 @@ import { useGameStore } from '../store/useGameStore';
 import { useAuth } from '../store/AuthContext';
 import { getPlayerId } from '../store/marketService';
 import { CREATURES } from '../data/creatures';
-import { getCurrentSeasonId, getSeasonLabel, getTimeUntilSeasonEnd, listenPastSeasons } from '../store/seasonService';
+import { getCurrentSeasonId, getSeasonLabel, getTimeUntilSeasonEnd, listenPastSeasons, getSeasonOffset } from '../store/seasonService';
 
 const { width: SW } = Dimensions.get('window');
 
@@ -212,6 +212,7 @@ export default function LeaderboardScreen() {
   const [seasonTime, setSeasonTime] = useState(getTimeUntilSeasonEnd());
   const [pastSeasons, setPastSeasons] = useState([]);
   const [showHistory, setShowHistory] = useState(false);
+  const [seasonOffset, setSeasonOffset] = useState({wins:0,score:0});
 
   const headerAnim = useRef(new Animated.Value(0)).current;
   const listAnims  = useRef(Array.from({length:100},()=>new Animated.Value(0))).current;
@@ -219,6 +220,7 @@ export default function LeaderboardScreen() {
   useEffect(()=>{
     Animated.timing(headerAnim,{toValue:1,duration:600,useNativeDriver:true}).start();
     const unsub = listenPastSeasons(setPastSeasons);
+    if (playerId) getSeasonOffset(playerId).then(setSeasonOffset);
     const interval = setInterval(()=>setSeasonTime(getTimeUntilSeasonEnd()), 60000);
     return ()=>{ unsub(); clearInterval(interval); };
   },[]);
@@ -232,8 +234,11 @@ export default function LeaderboardScreen() {
   }
 
   useEffect(()=>{
-    const score = computeScore({collection,wins,crystals});
-    setMyScore(score);
+    const rawScore = computeScore({collection,wins,crystals});
+    // Score de saison = score total - score au moment du dernier reset
+    const seasonScore = Math.max(0, rawScore - (seasonOffset.score||0));
+    const seasonWins = Math.max(0, wins - (seasonOffset.wins||0));
+    setMyScore(seasonScore);
     // Ne publie QUE si l'utilisateur est authentifié avec un vrai uid Firebase
     if (!user?.uid) return;
     const shinys = collection.filter(c=>c.isShiny).length;
@@ -243,12 +248,12 @@ export default function LeaderboardScreen() {
         .map(c=>c.id?.replace('_shiny',''))
     ).size;
     set(ref(db,`leaderboard/${user.uid}`),{
-      name:playerName,score,wins,
+      name:playerName,score:seasonScore,wins:seasonWins,
       creatures:collection.length,
       legendaries:legends,shinys,
       updatedAt:Date.now(),
     }).catch(()=>{});
-  },[collection,wins,crystals,user?.uid]);
+  },[collection,wins,crystals,user?.uid,seasonOffset]);
 
   useEffect(()=>{
     const unsub = onValue(ref(db,'leaderboard'),snap=>{
