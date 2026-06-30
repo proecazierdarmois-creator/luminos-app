@@ -6,7 +6,7 @@ export const CREATURES = {
   lumikos: {
     id: 'lumikos', number: '#001', name: 'LUMIKOS', jp: 'ルミコス',
     type: 'Lumière', rarity: 'common', rarityLabel: 'Common', rarityColor: '#00e5ff',
-    dropRate: 0.10,
+    dropRate: 0.1151,
     description: "Le petit guide des nuits. Sa gemme brille faiblement mais constamment.",
     color: '#a0d8ef', accentColor: '#7ee8fa', bgGradient: ['#0d1a2e', '#0a2040'],
     stats: { hp: 52, maxHp: 52, atk: 38, def: 30, spd: 61 },
@@ -18,7 +18,7 @@ export const CREATURES = {
   lumivex: {
     id: 'lumivex', number: '#002', name: 'LUMIVEX', jp: 'ルミベクス',
     type: 'Lumière · Vent', rarity: 'uncommon', rarityLabel: 'Uncommon', rarityColor: '#39ff8f',
-    dropRate: 0.08,
+    dropRate: 0.092,
     description: "Ses ailes de lumière lui permettent de glisser entre les nuages.",
     color: '#5cdba0', accentColor: '#39ff8f', bgGradient: ['#071a10', '#0a2818'],
     stats: { hp: 78, maxHp: 78, atk: 55, def: 48, spd: 78 },
@@ -30,7 +30,7 @@ export const CREATURES = {
   lumirex: {
     id: 'lumirex', number: '#003', name: 'LUMIREX', jp: 'ルミレックス',
     type: 'Lumière · Solaire', rarity: 'rare', rarityLabel: 'Rare', rarityColor: '#bf5fff',
-    dropRate: 0.04,
+    dropRate: 0.024,
     description: "Gardien de l'aurore. Son rugissement fait lever le soleil.",
     color: '#f0b030', accentColor: '#ffd700', bgGradient: ['#1a1000', '#2a1800'],
     stats: { hp: 105, maxHp: 105, atk: 82, def: 70, spd: 88 },
@@ -42,7 +42,7 @@ export const CREATURES = {
   luminos: {
     id: 'luminos', number: '#000', name: 'LUMINOS', jp: 'ルミノス',
     type: 'Cosmique · Légendaire', rarity: 'legendary', rarityLabel: '★ Légendaire', rarityColor: '#ffa500',
-    dropRate: 0.01,
+    dropRate: 0.006,
     description: "L'être de lumière primordiale. Son regard contient l'univers entier.",
     color: '#bf5fff', accentColor: '#ffa500', bgGradient: ['#0a0018', '#150030'],
     stats: { hp: 150, maxHp: 150, atk: 120, def: 100, spd: 110 },
@@ -56,7 +56,7 @@ export const CREATURES = {
   pyrox: {
     id: 'pyrox', number: '#004', name: 'PYROX', jp: 'ピロクス',
     type: 'Feu', rarity: 'common', rarityLabel: 'Common', rarityColor: '#ff6b35',
-    dropRate: 0.09,
+    dropRate: 0.1036,
     description: "Un petit dragon dont les narines crachent des étincelles quand il éternue.",
     color: '#ff6b35', accentColor: '#ffa500', bgGradient: ['#1a0800', '#2a1000'],
     stats: { hp: 58, maxHp: 58, atk: 48, def: 25, spd: 55 },
@@ -68,7 +68,7 @@ export const CREATURES = {
   aquila: {
     id: 'aquila', number: '#005', name: 'AQUILA', jp: 'アキラ',
     type: 'Eau', rarity: 'common', rarityLabel: 'Common', rarityColor: '#00aaff',
-    dropRate: 0.08,
+    dropRate: 0.092,
     description: "Vit dans les sources d'eau pure. Sa queue tourbillonne comme un petit courant.",
     color: '#00aaff', accentColor: '#80d4ff', bgGradient: ['#001a2e', '#002a40'],
     stats: { hp: 60, maxHp: 60, atk: 35, def: 45, spd: 58 },
@@ -80,7 +80,7 @@ export const CREATURES = {
   terrak: {
     id: 'terrak', number: '#006', name: 'TERRAK', jp: 'テラク',
     type: 'Terre · Pierre', rarity: 'uncommon', rarityLabel: 'Uncommon', rarityColor: '#c8a850',
-    dropRate: 0.06,
+    dropRate: 0.069,
     description: "Son dos est recouvert de cristaux de roche. Dort sous terre pendant des siècles.",
     color: '#c8a850', accentColor: '#e8c870', bgGradient: ['#1a1400', '#2a2000'],
     stats: { hp: 90, maxHp: 90, atk: 60, def: 85, spd: 30 },
@@ -92,7 +92,7 @@ export const CREATURES = {
   ventis: {
     id: 'ventis', number: '#007', name: 'VENTIS', jp: 'ベンティス',
     type: 'Air · Tempête', rarity: 'rare', rarityLabel: 'Rare', rarityColor: '#a0c8ff',
-    dropRate: 0.03,
+    dropRate: 0.018,
     description: "Né d'un cyclone. Ses ailes déchirent le ciel et provoquent des tempêtes locales.",
     color: '#a0c8ff', accentColor: '#e0f0ff', bgGradient: ['#060d1a', '#0a1828'],
     stats: { hp: 88, maxHp: 88, atk: 75, def: 42, spd: 105 },
@@ -104,7 +104,7 @@ export const CREATURES = {
   umbrax: {
     id: 'umbrax', number: '#008', name: 'UMBRAX', jp: 'ウンブラクス',
     type: 'Ombre · Néant', rarity: 'legendary', rarityLabel: '★ Légendaire', rarityColor: '#8844cc',
-    dropRate: 0.01,
+    dropRate: 0.006,
     description: "L'anti-lumière. Là où LUMINOS illumine, UMBRAX absorbe.",
     color: '#8844cc', accentColor: '#cc88ff', bgGradient: ['#08000f', '#100018'],
     stats: { hp: 140, maxHp: 140, atk: 130, def: 90, spd: 95 },
@@ -118,7 +118,7 @@ export const CREATURES = {
   florix: {
     id: 'florix', number: '#009', name: 'FLORIX', jp: 'フロリクス',
     type: 'Nature', rarity: 'common', rarityLabel: 'Common', rarityColor: '#76c442',
-    dropRate: 0.07,
+    dropRate: 0.0805,
     description: "Petite créature dont les oreilles sont des feuilles. Adore la pluie.",
     color: '#76c442', accentColor: '#aee060', bgGradient: ['#081408', '#101e08'],
     stats: { hp: 55, maxHp: 55, atk: 35, def: 42, spd: 50 },
@@ -130,7 +130,7 @@ export const CREATURES = {
   glacix: {
     id: 'glacix', number: '#010', name: 'GLACIX', jp: 'グラシクス',
     type: 'Glace · Cristal', rarity: 'uncommon', rarityLabel: 'Uncommon', rarityColor: '#80d4ff',
-    dropRate: 0.05,
+    dropRate: 0.0575,
     description: "Né dans les glaciers éternels. Son souffle congèle instantanément.",
     color: '#80d4ff', accentColor: '#c0eeff', bgGradient: ['#040e18', '#081828'],
     stats: { hp: 72, maxHp: 72, atk: 58, def: 65, spd: 45 },
@@ -142,7 +142,7 @@ export const CREATURES = {
   voltrax: {
     id: 'voltrax', number: '#011', name: 'VOLTRAX', jp: 'ボルトラクス',
     type: 'Foudre', rarity: 'uncommon', rarityLabel: 'Uncommon', rarityColor: '#ffe033',
-    dropRate: 0.05,
+    dropRate: 0.0575,
     description: "Court à la vitesse de l'éclair. Ses pattes génèrent des étincelles à chaque pas.",
     color: '#ffe033', accentColor: '#fff080', bgGradient: ['#181400', '#281e00'],
     stats: { hp: 60, maxHp: 60, atk: 70, def: 30, spd: 110 },
@@ -154,7 +154,7 @@ export const CREATURES = {
   spectrox: {
     id: 'spectrox', number: '#012', name: 'SPECTROX', jp: 'スペクトロクス',
     type: 'Fantôme · Mystère', rarity: 'rare', rarityLabel: 'Rare', rarityColor: '#cc77ff',
-    dropRate: 0.03,
+    dropRate: 0.018,
     description: "Traverse les murs. Apparaît uniquement quand la lune est pleine.",
     color: '#cc77ff', accentColor: '#e0aaff', bgGradient: ['#100018', '#180028'],
     stats: { hp: 82, maxHp: 82, atk: 88, def: 45, spd: 92 },
@@ -166,7 +166,7 @@ export const CREATURES = {
   bouldrak: {
     id: 'bouldrak', number: '#013', name: 'BOULDRAK', jp: 'ボウルドラク',
     type: 'Roche · Acier', rarity: 'uncommon', rarityLabel: 'Uncommon', rarityColor: '#a08860',
-    dropRate: 0.05,
+    dropRate: 0.0575,
     description: "Son corps est plus dur que le diamant. Dort pendant des décennies sous les montagnes.",
     color: '#a08860', accentColor: '#c0a880', bgGradient: ['#100c00', '#201800'],
     stats: { hp: 100, maxHp: 100, atk: 65, def: 100, spd: 20 },
@@ -178,7 +178,7 @@ export const CREATURES = {
   pyraflor: {
     id: 'pyraflor', number: '#014', name: 'PYRAFLOR', jp: 'ピラフロール',
     type: 'Feu · Nature', rarity: 'rare', rarityLabel: 'Rare', rarityColor: '#ff8c42',
-    dropRate: 0.03,
+    dropRate: 0.018,
     description: "Fleur de volcan. Ses pétales sont en flammes mais ne brûlent jamais.",
     color: '#ff8c42', accentColor: '#ffb880', bgGradient: ['#180800', '#281000'],
     stats: { hp: 88, maxHp: 88, atk: 78, def: 55, spd: 72 },
@@ -190,7 +190,7 @@ export const CREATURES = {
   aquafrost: {
     id: 'aquafrost', number: '#015', name: 'AQUAFROST', jp: 'アクアフロスト',
     type: 'Eau · Glace', rarity: 'rare', rarityLabel: 'Rare', rarityColor: '#40c8e0',
-    dropRate: 0.03,
+    dropRate: 0.018,
     description: "Mi-dauphin mi-cristal de glace. Nage dans les eaux arctiques à toute vitesse.",
     color: '#40c8e0', accentColor: '#80e0f0', bgGradient: ['#001820', '#002830'],
     stats: { hp: 95, maxHp: 95, atk: 72, def: 68, spd: 85 },
@@ -202,7 +202,7 @@ export const CREATURES = {
   thornix: {
     id: 'thornix', number: '#016', name: 'THORNIX', jp: 'ソーニクス',
     type: 'Nature · Poison', rarity: 'common', rarityLabel: 'Common', rarityColor: '#88cc44',
-    dropRate: 0.07,
+    dropRate: 0.0805,
     description: "Couvert d'épines venimeuses. Malgré son apparence, il est très affectueux avec ses amis.",
     color: '#88cc44', accentColor: '#aaee66', bgGradient: ['#081000', '#102000'],
     stats: { hp: 62, maxHp: 62, atk: 42, def: 48, spd: 58 },
@@ -214,7 +214,7 @@ export const CREATURES = {
   stormyx: {
     id: 'stormyx', number: '#017', name: 'STORMYX', jp: 'ストームイクス',
     type: 'Foudre · Tempête', rarity: 'legendary', rarityLabel: '★ Légendaire', rarityColor: '#ffdd00',
-    dropRate: 0.01,
+    dropRate: 0.006,
     description: "Seigneur des tempêtes. Quand il rugit, les cieux s'ouvrent et la foudre frappe.",
     color: '#ffdd00', accentColor: '#ffee80', bgGradient: ['#100e00', '#201c00'],
     stats: { hp: 145, maxHp: 145, atk: 125, def: 88, spd: 130 },
@@ -226,7 +226,7 @@ export const CREATURES = {
   crystara: {
     id: 'crystara', number: '#018', name: 'CRYSTARA', jp: 'クリスタラ',
     type: 'Cristal · Légendaire', rarity: 'legendary', rarityLabel: '★ Légendaire', rarityColor: '#aaeeff',
-    dropRate: 0.01,
+    dropRate: 0.006,
     description: "Forgée dans le cœur d'un glacier éternel. Son corps réfracte la lumière en millions d'éclats.",
     color: '#aaeeff', accentColor: '#ddf8ff', bgGradient: ['#001820', '#002030'],
     stats: { hp: 138, maxHp: 138, atk: 110, def: 120, spd: 95 },
@@ -240,7 +240,7 @@ export const CREATURES = {
   sonarix: {
     id: 'sonarix', number: '#026', name: 'SONARIX', jp: 'ソナリクス',
     type: 'Son · Écho', rarity: 'uncommon', rarityLabel: 'Uncommon', rarityColor: '#dd66ff',
-    dropRate: 0.045,
+    dropRate: 0.0518,
     description: "Communique par ultrasons. Son cri peut briser le verre à des kilomètres.",
     color: '#dd66ff', accentColor: '#f0aaff', bgGradient: ['#140020', '#1e0030'],
     stats: { hp: 70, maxHp: 70, atk: 65, def: 35, spd: 95 },
@@ -252,7 +252,7 @@ export const CREATURES = {
   magnetar: {
     id: 'magnetar', number: '#027', name: 'MAGNETAR', jp: 'マグネター',
     type: 'Métal · Magnétisme', rarity: 'rare', rarityLabel: 'Rare', rarityColor: '#7799cc',
-    dropRate: 0.028,
+    dropRate: 0.0168,
     description: "Son corps attire le métal environnant. Peut dévier les attaques avec des champs magnétiques.",
     color: '#7799cc', accentColor: '#aaccee', bgGradient: ['#0a1018', '#101824'],
     stats: { hp: 92, maxHp: 92, atk: 80, def: 78, spd: 60 },
@@ -264,7 +264,7 @@ export const CREATURES = {
   chronexis: {
     id: 'chronexis', number: '#028', name: 'CHRONEXIS', jp: 'クロネクシス',
     type: 'Temps · Mystère', rarity: 'legendary', rarityLabel: '★ Légendaire', rarityColor: '#44ddaa',
-    dropRate: 0.01,
+    dropRate: 0.006,
     description: "Existe simultanément dans le passé, le présent et le futur. Ses engrenages ne s'arrêtent jamais.",
     color: '#44ddaa', accentColor: '#88ffcc', bgGradient: ['#001a14', '#002a20'],
     stats: { hp: 142, maxHp: 142, atk: 115, def: 105, spd: 125 },
