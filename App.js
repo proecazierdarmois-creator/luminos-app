@@ -33,7 +33,8 @@ import AdminScreen       from './screens/AdminScreen';
 import HomeScreen        from './screens/HomeScreen';
 import NewsScreen        from './screens/NewsScreen';
 import InboxScreen       from './screens/InboxScreen';
-import SlotMachineScreen from './screens/SlotMachineScreen';
+import SlotMachineScreen    from './screens/SlotMachineScreen';
+import NotifSettingsScreen  from './screens/NotifSettingsScreen';
 
 const Tab = createBottomTabNavigator();
 const ADMIN_UID = 'NpKZ4aF5kVMlZTN3W8Wy3GCNOhK2';
@@ -111,6 +112,8 @@ function MainTabs() {
       <Tab.Screen name="Inbox" component={InboxScreen}
         options={{ tabBarButton:()=>null, tabBarStyle:{display:'none'} }}/>
       <Tab.Screen name="SlotMachine" component={SlotMachineScreen}
+        options={{ tabBarButton:()=>null, tabBarStyle:{display:'none'} }}/>
+      <Tab.Screen name="NotifSettings" component={NotifSettingsScreen}
         options={{ tabBarButton:()=>null, tabBarStyle:{display:'none'} }}/>
       <Tab.Screen name="Battle"       component={BattleScreen}
         options={{ tabBarIcon: ({ focused }) => <TabIcon icon="🗡️" label="COMBAT"    focused={focused} color="#ff6b35" /> }} />
